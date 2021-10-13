@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".HomeActivity">
+
+    <!--  Service Connections Panel  -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="240dp"
+        android:layout_height="wrap_content"
+        app:contentPadding="15dp"
+        android:layout_margin="10dp"
+        android:layout_gravity="left|top">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sevice Connections"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:background="@color/grey_light"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="15dp"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerviewHome"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <!--  Menu Panel  -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:contentPadding="3dp"
+        android:layout_margin="10dp"
+        android:layout_gravity="right|top">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageButton
+                android:id="@+id/download"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_round_cloud_download_24"
+                style="@style/TextAppearance.AppCompat.Widget.Button.Borderless.Colored"
+                android:background="?android:selectableItemBackground"
+                android:padding="10dp"
+                android:tooltipText="Download Service Connections"
+                app:tint="@color/secondary_500"/>
+
+            <ImageButton
+                android:id="@+id/upload"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_round_cloud_upload_24"
+                style="@style/TextAppearance.AppCompat.Widget.Button.Borderless.Colored"
+                android:background="?android:selectableItemBackground"
+                android:padding="10dp"
+                android:tooltipText="Upload Service Connections"
+                app:tint="@color/secondary_500"/>
+
+            <ImageButton
+                android:id="@+id/archive"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_round_archive_24"
+                style="@style/TextAppearance.AppCompat.Widget.Button.Borderless.Colored"
+                android:background="?android:selectableItemBackground"
+                android:padding="10dp"
+                android:tooltipText="History and Archives"
+                app:tint="@color/secondary_500"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:background="@color/grey_light"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"/>
+
+            <ImageButton
+                android:id="@+id/settings"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_round_settings_24"
+                style="@style/TextAppearance.AppCompat.Widget.Button.Borderless.Colored"
+                android:background="?android:selectableItemBackground"
+                android:padding="10dp"
+                android:tooltipText="Settings"
+                app:tint="@color/secondary_500"/>
+
+            <ImageButton
+                android:id="@+id/logout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_round_login_24"
+                style="@style/TextAppearance.AppCompat.Widget.Button.Borderless.Colored"
+                android:background="?android:selectableItemBackground"
+                android:padding="10dp"
+                android:tooltipText="Logout"
+                app:tint="@color/secondary_500"/>
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <com.mapbox.mapboxsdk.maps.MapView
+        android:id="@+id/mapViewForm"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:mapbox_cameraZoom="15" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
