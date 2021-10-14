@@ -8,10 +8,12 @@
 
     <!--  Service Connections Panel  -->
     <androidx.cardview.widget.CardView
-        android:layout_width="240dp"
+        android:layout_width="260dp"
         android:layout_height="wrap_content"
         app:contentPadding="15dp"
-        android:layout_margin="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginBottom="80dp"
         android:layout_gravity="left|top">
 
         <LinearLayout
@@ -20,6 +22,7 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/scQueueTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Sevice Connections"/>
@@ -52,6 +55,24 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
+            <ImageButton
+                android:id="@+id/refreshAll"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_round_refresh_24"
+                style="@style/TextAppearance.AppCompat.Widget.Button.Borderless.Colored"
+                android:background="?android:selectableItemBackground"
+                android:padding="10dp"
+                android:tooltipText="Refresh"
+                app:tint="@color/secondary_500"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:background="@color/grey_light"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"/>
 
             <ImageButton
                 android:id="@+id/download"

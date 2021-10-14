@@ -19,6 +19,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CRMCrewHub">
         <activity
+            android:name=".UpdateServiceConnectionsActivity"
+            android:exported="true" />
+        <activity
             android:name=".BarangaysActivity"
             android:exported="true" />
         <activity

@@ -3,6 +3,7 @@ package com.lopez.julz.crmcrewhub.api;
 import com.lopez.julz.crmcrewhub.classes.Barangays;
 import com.lopez.julz.crmcrewhub.classes.Login;
 import com.lopez.julz.crmcrewhub.classes.Towns;
+import com.lopez.julz.crmcrewhub.database.ServiceConnectionInspections;
 import com.lopez.julz.crmcrewhub.database.ServiceConnections;
 
 import java.util.List;
@@ -24,4 +25,7 @@ public interface RequestPlaceHolder {
 
     @GET("get-barangays")
     Call<List<Barangays>> getBarangays();
+
+    @GET("get-inspections-for-energization-data")
+    Call<List<ServiceConnectionInspections>> getInspectionsForEnergizationData();
 }

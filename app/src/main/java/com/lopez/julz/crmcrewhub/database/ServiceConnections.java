@@ -74,6 +74,12 @@ public class ServiceConnections {
     @ColumnInfo(name = "ORDate")
     private String ORDate;
 
+    @ColumnInfo(name = "DateTimeLinemenArrived")
+    private String DateTimeLinemenArrived;
+
+    @ColumnInfo(name = "DateTimeOfEnergization")
+    private String DateTimeOfEnergization;
+
     @ColumnInfo(name = "EnergizationOrderIssued")
     private String EnergizationOrderIssued;
 
@@ -94,7 +100,7 @@ public class ServiceConnections {
 
     public ServiceConnections() {}
 
-    public ServiceConnections(@NonNull String id, String memberConsumerId, String dateOfApplication, String serviceAccountName, String accountCount, String sitio, String barangay, String town, String contactNumber, String emailAddress, String accountType, String accountOrganization, String organizationAccountNumber, String isNIHE, String accountApplicationType, String connectionApplicationType, String buildingType, String status, String notes, String trash, String ORNumber, String ORDate, String energizationOrderIssued, String dateTimeOfEnergizationIssue, String stationCrewAssigned, String loadCategory, String temporaryDurationInMonths, String longSpan) {
+    public ServiceConnections(@NonNull String id, String memberConsumerId, String dateOfApplication, String serviceAccountName, String accountCount, String sitio, String barangay, String town, String contactNumber, String emailAddress, String accountType, String accountOrganization, String organizationAccountNumber, String isNIHE, String accountApplicationType, String connectionApplicationType, String buildingType, String status, String notes, String trash, String ORNumber, String ORDate, String dateTimeLinemenArrived, String dateTimeOfEnergization, String energizationOrderIssued, String dateTimeOfEnergizationIssue, String stationCrewAssigned, String loadCategory, String temporaryDurationInMonths, String longSpan) {
         this.id = id;
         MemberConsumerId = memberConsumerId;
         DateOfApplication = dateOfApplication;
@@ -117,6 +123,8 @@ public class ServiceConnections {
         Trash = trash;
         this.ORNumber = ORNumber;
         this.ORDate = ORDate;
+        DateTimeLinemenArrived = dateTimeLinemenArrived;
+        DateTimeOfEnergization = dateTimeOfEnergization;
         EnergizationOrderIssued = energizationOrderIssued;
         DateTimeOfEnergizationIssue = dateTimeOfEnergizationIssue;
         StationCrewAssigned = stationCrewAssigned;
@@ -308,6 +316,22 @@ public class ServiceConnections {
 
     public void setEnergizationOrderIssued(String energizationOrderIssued) {
         EnergizationOrderIssued = energizationOrderIssued;
+    }
+
+    public String getDateTimeLinemenArrived() {
+        return DateTimeLinemenArrived;
+    }
+
+    public void setDateTimeLinemenArrived(String dateTimeLinemenArrived) {
+        DateTimeLinemenArrived = dateTimeLinemenArrived;
+    }
+
+    public String getDateTimeOfEnergization() {
+        return DateTimeOfEnergization;
+    }
+
+    public void setDateTimeOfEnergization(String dateTimeOfEnergization) {
+        DateTimeOfEnergization = dateTimeOfEnergization;
     }
 
     public String getDateTimeOfEnergizationIssue() {

@@ -1,35 +1,44 @@
 package com.lopez.julz.crmcrewhub;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.room.Room;
-
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.room.Room;
+
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.gson.JsonParser;
 import com.lopez.julz.crmcrewhub.api.RequestPlaceHolder;
 import com.lopez.julz.crmcrewhub.api.RetrofitBuilder;
 import com.lopez.julz.crmcrewhub.classes.Barangays;
+import com.lopez.julz.crmcrewhub.classes.ConsumerInfo;
+import com.lopez.julz.crmcrewhub.classes.HomeServiceConnectionsQueueAdapter;
 import com.lopez.julz.crmcrewhub.classes.ObjectHelpers;
 import com.lopez.julz.crmcrewhub.classes.Towns;
 import com.lopez.julz.crmcrewhub.database.AppDatabase;
 import com.lopez.julz.crmcrewhub.database.BarangaysDao;
+import com.lopez.julz.crmcrewhub.database.ServiceConnectionInspections;
+import com.lopez.julz.crmcrewhub.database.ServiceConnectionInspectionsDao;
+import com.lopez.julz.crmcrewhub.database.ServiceConnections;
+import com.lopez.julz.crmcrewhub.database.ServiceConnectionsDao;
 import com.lopez.julz.crmcrewhub.database.TownsDao;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.location.LocationComponent;
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions;
 import com.mapbox.mapboxsdk.location.modes.CameraMode;
@@ -38,8 +47,13 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
+import com.mapbox.mapboxsdk.plugins.annotation.OnSymbolClickListener;
+import com.mapbox.mapboxsdk.plugins.annotation.OnSymbolLongClickListener;
+import com.mapbox.mapboxsdk.plugins.annotation.Symbol;
+import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager;
+import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions;
 
-
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -53,16 +67,25 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
     private PermissionsManager permissionsManager;
     private MapboxMap mapboxMap;
     private LocationComponent locationComponent;
+    public Style style;
 
     // MENU BUTTONS
-    private ImageButton logout, settings, download, upload, archive;
-
-    public List<Barangays> barangaysList;
+    private ImageButton refreshAll, logout, settings, download, upload, archive;
 
     public RetrofitBuilder retrofitBuilder;
     private RequestPlaceHolder requestPlaceHolder;
 
     public AppDatabase db;
+
+    public RecyclerView recyclerviewHome;
+    public List<ServiceConnections> serviceConnectionsList;
+    public HomeServiceConnectionsQueueAdapter homeServiceConnectionsQueueAdapter;
+    public TextView scQueueTitle;
+
+    // mapbox markers from active queue
+    public List<ServiceConnectionInspections> inspectionsList;
+
+    public BottomSheetBehavior bottomSheetBehavior;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +110,16 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
         download = (ImageButton) findViewById(R.id.download);
         upload = (ImageButton) findViewById(R.id.upload);
         archive = (ImageButton) findViewById(R.id.archive);
+        refreshAll = findViewById(R.id.refreshAll);
+
+        // recyclerview
+        recyclerviewHome = findViewById(R.id.recyclerviewHome);
+        scQueueTitle = findViewById(R.id.scQueueTitle);
+        serviceConnectionsList = new ArrayList<>();
+        inspectionsList = new ArrayList<>();
+        homeServiceConnectionsQueueAdapter = new HomeServiceConnectionsQueueAdapter(serviceConnectionsList, this);
+        recyclerviewHome.setAdapter(homeServiceConnectionsQueueAdapter);
+        recyclerviewHome.setLayoutManager(new LinearLayoutManager(this));
 
         // DOWNLOAD ASSETS
         downloadTownsBackground();
@@ -111,6 +144,13 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(HomeActivity.this, SettingsActivity.class));
+            }
+        });
+
+        refreshAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new FetchQueuedServiceConnections().execute();
             }
         });
     }
@@ -144,14 +184,91 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
     public void onMapReady(@NonNull MapboxMap mapboxMap) {
         try {
             this.mapboxMap = mapboxMap;
-            mapboxMap.setStyle(Style.SATELLITE_STREETS, new Style.OnStyleLoaded() {
+            mapboxMap.setStyle(new Style.Builder()
+                    .fromUri(getResources().getString(R.string.mapbox_style)), new Style.OnStyleLoaded() {
                 @Override
                 public void onStyleLoaded(@NonNull Style style) {
+                    setStyle(style);
+                    // initialize queues
+                    new FetchQueuedServiceConnections().execute();
+
                     enableLocationComponent(style);
                 }
             });
         } catch (Exception e) {
             Log.e("ERR_INIT_MAPBOX", e.getMessage());
+        }
+    }
+
+    public void setStyle(Style style) {
+        this.style = style;
+    }
+
+    public String getLatLongFromInspections(ServiceConnectionInspections inspections) {
+        if (inspections.getGeoBuilding() != null) {
+            return inspections.getGeoBuilding();
+        } else if (inspections.getGeoMeteringPole() != null) {
+            return inspections.getGeoMeteringPole();
+        } else if (inspections.getGeoSEPole() != null) {
+            return inspections.getGeoSEPole();
+        } else if (inspections.getGeoTappingPole() != null) {
+            return inspections.getGeoTappingPole();
+        } else {
+            return "";
+        }
+    }
+
+    public void addMarkers(Style style) {
+        try {
+            // ADD MARKERS
+            SymbolManager symbolManager = new SymbolManager(mapView, mapboxMap, style);
+
+            symbolManager.setIconAllowOverlap(true);
+            symbolManager.setTextAllowOverlap(true);
+
+            if (inspectionsList != null) {
+                int totalMakers = inspectionsList.size();
+
+                for(int i=0; i<totalMakers; i++) {
+                    ServiceConnectionInspections insp = inspectionsList.get(i);
+                    if (!getLatLongFromInspections(insp).equals("")) {
+                        String lati = getLatLongFromInspections(insp).split(",")[0];
+                        String longi = getLatLongFromInspections(insp).split(",")[1];
+
+                        SymbolOptions symbolOptions = new SymbolOptions()
+                                .withLatLng(new LatLng(Double.valueOf(lati), Double.valueOf(longi)))
+                                .withData(new JsonParser().parse("{" +
+                                                                            "'id' : '" + insp.getId() + "'," +
+                                                                            "'scId' : '" + insp.getServiceConnectionId() + "'}"))
+                                .withIconImage("place-black-24dp")
+                                .withIconSize(1.3f);
+
+                        Symbol symbol = symbolManager.create(symbolOptions);
+                    }
+                }
+            }
+
+            symbolManager.addClickListener(new OnSymbolClickListener() {
+                @Override
+                public boolean onAnnotationClick(Symbol symbol) {
+//                    Toast.makeText(HomeActivity.this, symbol.getData().getAsJsonObject().get("scId").getAsString(), Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(HomeActivity.this, UpdateServiceConnectionsActivity.class);
+                    intent.putExtra("SCID", symbol.getData().getAsJsonObject().get("scId").getAsString());
+                    intent.putExtra("INSP_ID", symbol.getData().getAsJsonObject().get("id").getAsString());
+                    startActivity(intent);
+                    return false;
+                }
+            });
+
+            symbolManager.addLongClickListener(new OnSymbolLongClickListener() {
+                @Override
+                public boolean onAnnotationLongClick(Symbol symbol) {
+                    new FetchConsumerInfo().execute(symbol.getData().getAsJsonObject().get("scId").getAsString());
+                    return false;
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -274,6 +391,11 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
 
         @Override
         protected Void doInBackground(List<Towns>... lists) {
+//            ServiceConnectionsDao serviceConnectionsDao = db.serviceConnectionsDao();
+//            serviceConnectionsDao.deleteAll();
+//            ServiceConnectionInspectionsDao serviceConnectionInspectionsDao = db.serviceConnectionInspectionsDao();
+//            serviceConnectionInspectionsDao.deleteAll();
+
             List<Towns> towns = lists[0];
             int count = towns.size();
 
@@ -397,4 +519,90 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
             Log.e("ERR_STRT_PWD_DLG", e.getMessage());
         }
     }
+
+    public class FetchQueuedServiceConnections extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            try {
+                ServiceConnectionsDao serviceConnectionsDao = db.serviceConnectionsDao();
+                ServiceConnectionInspectionsDao serviceConnectionInspectionsDao = db.serviceConnectionInspectionsDao();
+
+                List<ServiceConnections> serviceConnections = serviceConnectionsDao.getQueue();
+
+                for(int i=0; i<serviceConnections.size(); i++) {
+                    serviceConnectionsList.add(serviceConnections.get(i));
+
+                    // FETCH INSPECTIONS FROM ACTIVE QUEUE
+                    ServiceConnectionInspections inspection = serviceConnectionInspectionsDao.getOneByServiceConnectionId(serviceConnections.get(i).getId());
+                    Log.e("TEST", serviceConnections.get(i).getServiceAccountName());
+                    inspectionsList.add(inspection);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            serviceConnectionsList.clear();
+            inspectionsList.clear();
+        }
+
+        @Override
+        protected void onPostExecute(Void unused) {
+            super.onPostExecute(unused);
+            homeServiceConnectionsQueueAdapter.notifyDataSetChanged();
+            scQueueTitle.setText("Service Connections (" + serviceConnectionsList.size() + ")");
+            addMarkers(style);
+        }
+    }
+
+    public class FetchConsumerInfo extends AsyncTask<String, Void, Void> {
+
+        private ConsumerInfo consumerInfo;
+
+        @Override
+        protected Void doInBackground(String... strings) {
+            try {
+                ServiceConnectionsDao serviceConnectionsDao = db.serviceConnectionsDao();
+
+                ServiceConnections consumerData = serviceConnectionsDao.getOne(strings[0]);
+
+                BarangaysDao barangaysDao = db.barangaysDao();
+                TownsDao townsDao = db.townsDao();
+
+                consumerInfo = new ConsumerInfo(consumerData.getServiceAccountName(),
+                                            barangaysDao.getOne(consumerData.getBarangay()).getBarangay(),
+                                            townsDao.getOne(consumerData.getTown()).getTown());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void unused) {
+            super.onPostExecute(unused);
+            AlertDialog.Builder builder = new AlertDialog.Builder(HomeActivity.this);
+
+            builder.setTitle(consumerInfo.getName());
+            builder.setMessage(consumerInfo.getBarangay() + ", " + consumerInfo.getTown());
+
+            builder.setNegativeButton("Close", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+
+            AlertDialog dialog = builder.create();
+
+            dialog.show();
+        }
+    }
+
+
 }

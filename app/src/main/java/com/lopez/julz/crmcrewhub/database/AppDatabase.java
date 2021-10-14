@@ -6,7 +6,7 @@ import androidx.room.RoomDatabase;
 import com.lopez.julz.crmcrewhub.classes.Barangays;
 import com.lopez.julz.crmcrewhub.classes.Towns;
 
-@Database(entities = {Users.class, Barangays.class, Towns.class}, version = 2)
+@Database(entities = {Users.class, Barangays.class, Towns.class, ServiceConnections.class, ServiceConnectionInspections.class}, version = 5)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract UsersDao usersDao();
 
@@ -14,4 +14,7 @@ public abstract class AppDatabase extends RoomDatabase {
 
     public abstract BarangaysDao barangaysDao();
 
+    public abstract ServiceConnectionsDao serviceConnectionsDao();
+
+    public abstract ServiceConnectionInspectionsDao serviceConnectionInspectionsDao();
 }
