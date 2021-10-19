@@ -18,12 +18,15 @@ import android.widget.Toast;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.gson.JsonParser;
+import com.lopez.julz.crmcrewhub.classes.AlertHelpers;
 import com.lopez.julz.crmcrewhub.classes.ObjectHelpers;
 import com.lopez.julz.crmcrewhub.database.AppDatabase;
 import com.lopez.julz.crmcrewhub.database.ServiceConnectionInspections;
 import com.lopez.julz.crmcrewhub.database.ServiceConnectionInspectionsDao;
 import com.lopez.julz.crmcrewhub.database.ServiceConnections;
 import com.lopez.julz.crmcrewhub.database.ServiceConnectionsDao;
+import com.lopez.julz.crmcrewhub.database.TimeFrames;
+import com.lopez.julz.crmcrewhub.database.TimeFramesDao;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
@@ -56,7 +59,7 @@ public class UpdateServiceConnectionsActivity extends AppCompatActivity implemen
     public Toolbar updateToolbar;
     public TextView accountName; // title
 
-    public String scId, inspId;
+    public String scId, inspId, userId;
 
     public ServiceConnections serviceConnections;
     public ServiceConnectionInspections serviceConnectionInspections;
@@ -74,6 +77,9 @@ public class UpdateServiceConnectionsActivity extends AppCompatActivity implemen
 
         scId = getIntent().getExtras().getString("SCID");
         inspId = getIntent().getExtras().getString("INSP_ID");
+        userId = getIntent().getExtras().getString("USERID");
+
+        Log.e(userId, userId);
 
         db = Room.databaseBuilder(this, AppDatabase.class, ObjectHelpers.databaseName()).fallbackToDestructiveMigration().build();
 
@@ -115,7 +121,16 @@ public class UpdateServiceConnectionsActivity extends AppCompatActivity implemen
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            new SaveData().execute();
+            if (ObjectHelpers.getSelectedTextFromRadioGroup(assessment, getWindow().getDecorView()) != null ) {
+                if (ObjectHelpers.getSelectedTextFromRadioGroup(assessment, getWindow().getDecorView()).equals("Energized") & (arrivalDateTime.getText().toString().isEmpty() | energizationDateTime.getText().toString().isEmpty())) {
+                    AlertHelpers.showInfoDialog(UpdateServiceConnectionsActivity.this, "No Timestamp Provided", "You must provide 'TIME OF ARRIVAL' and 'TIME OF ENERGIZATION' since you selected the 'ENERGIZED OPTION'. " +
+                            "To continue saving without the timestamps, select 'NOT ENERGIZED'.");
+                } else {
+                    new SaveData().execute();
+                }
+            } else {
+                finish();
+            }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -222,7 +237,16 @@ public class UpdateServiceConnectionsActivity extends AppCompatActivity implemen
     @Override
     protected void onStop() {
         super.onStop();
-        new SaveData().execute();
+        if (ObjectHelpers.getSelectedTextFromRadioGroup(assessment, getWindow().getDecorView()) != null ) {
+            if (ObjectHelpers.getSelectedTextFromRadioGroup(assessment, getWindow().getDecorView()).equals("Energized") & (arrivalDateTime.getText().toString().isEmpty() | energizationDateTime.getText().toString().isEmpty())) {
+                AlertHelpers.showInfoDialog(UpdateServiceConnectionsActivity.this, "No Timestamp Provided", "You must provide 'TIME OF ARRIVAL' and 'TIME OF ENERGIZATION' since you selected the 'ENERGIZED OPTION'. " +
+                        "To continue saving without the timestamps, select 'NOT ENERGIZED'.");
+            } else {
+                new SaveData().execute();
+            }
+        } else {
+            finish();
+        }
         mapView.onStop();
     }
 
@@ -341,6 +365,11 @@ public class UpdateServiceConnectionsActivity extends AppCompatActivity implemen
     public class SaveData extends AsyncTask<String, Void, Void> {
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
         protected Void doInBackground(String... strings) {
             try {
                 ServiceConnectionsDao serviceConnectionsDao = db.serviceConnectionsDao();
@@ -350,10 +379,29 @@ public class UpdateServiceConnectionsActivity extends AppCompatActivity implemen
                 if (ObjectHelpers.getSelectedTextFromRadioGroup(assessment, getWindow().getDecorView()) != null) {
                     serviceConnections.setStatus(ObjectHelpers.getSelectedTextFromRadioGroup(assessment, getWindow().getDecorView()));
                 }
-
                 serviceConnections.setNotes(remarks.getText().toString());
 
                 serviceConnectionsDao.updateAll(serviceConnections);
+
+                // CREATE TIMEFRAMES
+                if (ObjectHelpers.getSelectedTextFromRadioGroup(assessment, getWindow().getDecorView()) != null) {
+                    TimeFramesDao timeFramesDao = db.timeFramesDao();
+
+                    TimeFrames timeFrames = new TimeFrames();
+                    timeFrames.setId(ObjectHelpers.getTimeInMillis());
+                    timeFrames.setServiceConnectionId(serviceConnections.getId());
+                    timeFrames.setUser(userId);
+                    timeFrames.setStatus(ObjectHelpers.getSelectedTextFromRadioGroup(assessment, getWindow().getDecorView()));
+                    timeFrames.setCreated_at(ObjectHelpers.getDateTime());
+                    timeFrames.setUpdated_at(ObjectHelpers.getDateTime());
+                    timeFrames.setArrivalDate(serviceConnections.getDateTimeLinemenArrived());
+                    timeFrames.setEnergizationDate(serviceConnections.getDateTimeOfEnergization());
+                    timeFrames.setReason(serviceConnections.getNotes());
+                    timeFrames.setIsUploaded("No");
+
+                    timeFramesDao.insertAll(timeFrames);
+                }
+
             } catch (Exception e) {
                 e.printStackTrace();
             }

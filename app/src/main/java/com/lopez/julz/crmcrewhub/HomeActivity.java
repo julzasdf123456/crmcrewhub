@@ -87,11 +87,17 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
 
     public BottomSheetBehavior bottomSheetBehavior;
 
+    public SymbolManager symbolManager;
+
+    public String userId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Mapbox.getInstance(this, getString(R.string.mapbox_access_token));
         setContentView(R.layout.activity_home);
+
+        userId = getIntent().getExtras().getString("USERID");
 
         retrofitBuilder = new RetrofitBuilder();
         requestPlaceHolder = retrofitBuilder.getRetrofit().create(RequestPlaceHolder.class);
@@ -117,7 +123,7 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
         scQueueTitle = findViewById(R.id.scQueueTitle);
         serviceConnectionsList = new ArrayList<>();
         inspectionsList = new ArrayList<>();
-        homeServiceConnectionsQueueAdapter = new HomeServiceConnectionsQueueAdapter(serviceConnectionsList, this);
+        homeServiceConnectionsQueueAdapter = new HomeServiceConnectionsQueueAdapter(serviceConnectionsList, this, userId);
         recyclerviewHome.setAdapter(homeServiceConnectionsQueueAdapter);
         recyclerviewHome.setLayoutManager(new LinearLayoutManager(this));
 
@@ -151,6 +157,13 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
             @Override
             public void onClick(View v) {
                 new FetchQueuedServiceConnections().execute();
+            }
+        });
+
+        upload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(HomeActivity.this, UploadActivity.class));
             }
         });
     }
@@ -221,7 +234,7 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
     public void addMarkers(Style style) {
         try {
             // ADD MARKERS
-            SymbolManager symbolManager = new SymbolManager(mapView, mapboxMap, style);
+            symbolManager = new SymbolManager(mapView, mapboxMap, style);
 
             symbolManager.setIconAllowOverlap(true);
             symbolManager.setTextAllowOverlap(true);
@@ -255,6 +268,7 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
                     Intent intent = new Intent(HomeActivity.this, UpdateServiceConnectionsActivity.class);
                     intent.putExtra("SCID", symbol.getData().getAsJsonObject().get("scId").getAsString());
                     intent.putExtra("INSP_ID", symbol.getData().getAsJsonObject().get("id").getAsString());
+                    intent.putExtra("USERID", userId);
                     startActivity(intent);
                     return false;
                 }
@@ -319,6 +333,7 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
     protected void onResume() {
         super.onResume();
         mapView.onResume();
+        new FetchQueuedServiceConnections().execute();
     }
 
     @Override
@@ -395,6 +410,11 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
 //            serviceConnectionsDao.deleteAll();
 //            ServiceConnectionInspectionsDao serviceConnectionInspectionsDao = db.serviceConnectionInspectionsDao();
 //            serviceConnectionInspectionsDao.deleteAll();
+//            BarangaysDao barangaysDao = db.barangaysDao();
+//            List<Barangays> list = barangaysDao.getAll();
+//            for (int i=0; i<list.size(); i++) {
+//                Log.e("ERR", list.get(i).getBarangay() + " - " + list.get(i).getTownId());
+//            }
 
             List<Towns> towns = lists[0];
             int count = towns.size();
@@ -535,7 +555,7 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
 
                     // FETCH INSPECTIONS FROM ACTIVE QUEUE
                     ServiceConnectionInspections inspection = serviceConnectionInspectionsDao.getOneByServiceConnectionId(serviceConnections.get(i).getId());
-                    Log.e("TEST", serviceConnections.get(i).getServiceAccountName());
+//                    Log.e("TEST", serviceConnections.get(i).getServiceAccountName());
                     inspectionsList.add(inspection);
                 }
             } catch (Exception e) {
@@ -556,6 +576,9 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
             super.onPostExecute(unused);
             homeServiceConnectionsQueueAdapter.notifyDataSetChanged();
             scQueueTitle.setText("Service Connections (" + serviceConnectionsList.size() + ")");
+            if (symbolManager != null) {
+                symbolManager.deleteAll();
+            }
             addMarkers(style);
         }
     }

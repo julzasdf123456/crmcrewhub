@@ -5,6 +5,8 @@ import com.lopez.julz.crmcrewhub.classes.Login;
 import com.lopez.julz.crmcrewhub.classes.Towns;
 import com.lopez.julz.crmcrewhub.database.ServiceConnectionInspections;
 import com.lopez.julz.crmcrewhub.database.ServiceConnections;
+import com.lopez.julz.crmcrewhub.database.TimeFrames;
+import com.lopez.julz.crmcrewhub.database.TimeFramesDao;
 
 import java.util.List;
 
@@ -28,4 +30,10 @@ public interface RequestPlaceHolder {
 
     @GET("get-inspections-for-energization-data")
     Call<List<ServiceConnectionInspections>> getInspectionsForEnergizationData();
+
+    @POST("update-energized")
+    Call<ServiceConnections> uploadServiceConnection(@Body ServiceConnections serviceConnections);
+
+    @POST("create-timeframes")
+    Call<TimeFrames> uploadTimeFrames(@Body TimeFrames timeFrames);
 }

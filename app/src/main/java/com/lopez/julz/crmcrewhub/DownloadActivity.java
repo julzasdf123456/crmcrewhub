@@ -17,6 +17,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.lopez.julz.crmcrewhub.api.RequestPlaceHolder;
 import com.lopez.julz.crmcrewhub.api.RetrofitBuilder;
+import com.lopez.julz.crmcrewhub.classes.AlertHelpers;
 import com.lopez.julz.crmcrewhub.classes.DownloadAdapter;
 import com.lopez.julz.crmcrewhub.classes.ObjectHelpers;
 import com.lopez.julz.crmcrewhub.database.AppDatabase;
@@ -235,6 +236,9 @@ public class DownloadActivity extends AppCompatActivity {
         protected void onPostExecute(Void unused) {
             super.onPostExecute(unused);
             Log.e("DOWNLOAD_FINISHED", "Download finished");
+
+            // show alert dialog
+            AlertHelpers.showExitableInfoDialog(DownloadActivity.this, DownloadActivity.this, "Download finished!", "All data downloaded successfully!");
         }
     }
 

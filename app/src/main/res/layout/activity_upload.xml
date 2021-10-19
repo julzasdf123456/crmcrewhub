@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".UploadActivity">
+
+<!--    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout-->
+<!--        android:id="@+id/refreshUpload"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content">-->
+
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_column="1"
+                    android:layout_weight="1"
+                    app:contentPadding="10dp"
+                    android:layout_margin="15dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <TextView
+                                android:id="@+id/scCount"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:drawableLeft="@drawable/ic_round_cloud_upload_24"
+                                android:drawablePadding="10dp"
+                                android:gravity="center"
+                                android:text="Service Connections"
+                                android:textColor="@color/black" />
+
+                            <com.google.android.material.progressindicator.CircularProgressIndicator
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/scProgressUpload"
+                                android:layout_alignParentRight="true"
+                                app:indicatorColor="@color/secondary_500"
+                                android:indeterminate="true"
+                                app:indicatorSize="20dp"/>
+
+                        </RelativeLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1px"
+                            android:background="@color/grey_light"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginBottom="15dp"/>
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/uploadRecyclerViewServiceConnections"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"/>
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_column="2"
+                    android:layout_weight="1"
+                    app:contentPadding="10dp"
+                    android:layout_margin="15dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Tickets/Service Memos"
+                                android:textColor="@color/black"
+                                android:drawableLeft="@drawable/ic_round_cloud_upload_24"
+                                android:drawablePadding="10dp"
+                                android:gravity="center"/>
+
+                            <com.google.android.material.progressindicator.CircularProgressIndicator
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/ticketsProgressUpload"
+                                android:layout_alignParentRight="true"
+                                app:indicatorColor="@color/secondary_500"
+                                android:indeterminate="true"
+                                app:indicatorSize="20dp"/>
+
+                        </RelativeLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1px"
+                            android:background="@color/grey_light"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginBottom="15dp"/>
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/uploadRecyclerViewTickets"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"/>
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+            </TableRow>
+
+        </TableLayout>
+
+<!--    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>-->
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/uploadDataBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|bottom"
+        android:layout_margin="10dp"
+        android:src="@drawable/ic_round_cloud_upload_24"
+        app:tint="@color/white"
+        android:tooltipText="Upload all data"/>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

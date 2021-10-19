@@ -1,7 +1,6 @@
 package com.lopez.julz.crmcrewhub.classes;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,13 +8,10 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 
-import com.lopez.julz.crmcrewhub.HomeActivity;
 import com.lopez.julz.crmcrewhub.R;
-import com.lopez.julz.crmcrewhub.UpdateServiceConnectionsActivity;
 import com.lopez.julz.crmcrewhub.database.AppDatabase;
 import com.lopez.julz.crmcrewhub.database.BarangaysDao;
 import com.lopez.julz.crmcrewhub.database.ServiceConnections;
@@ -23,24 +19,21 @@ import com.lopez.julz.crmcrewhub.database.TownsDao;
 
 import java.util.List;
 
-public class HomeServiceConnectionsQueueAdapter extends RecyclerView.Adapter<HomeServiceConnectionsQueueAdapter.ViewHolder> {
+public class UploadServiceConnectionsAdapter extends RecyclerView.Adapter<UploadServiceConnectionsAdapter.ViewHolder> {
 
-    public Context context;
     public List<ServiceConnections> serviceConnectionsList;
-    public String userId;
+    public Context context;
     public AppDatabase db;
 
-    public HomeServiceConnectionsQueueAdapter(List<ServiceConnections> serviceConnectionsList, Context context, String userId) {
+    public UploadServiceConnectionsAdapter(List<ServiceConnections> serviceConnectionsList, Context context) {
         this.serviceConnectionsList = serviceConnectionsList;
         this.context = context;
-        this.userId = userId;
-        db = Room.databaseBuilder(context,
-                AppDatabase.class, ObjectHelpers.databaseName()).fallbackToDestructiveMigration().build();
+        db = Room.databaseBuilder(context, AppDatabase.class, ObjectHelpers.databaseName()).fallbackToDestructiveMigration().build();
     }
 
     @NonNull
     @Override
-    public HomeServiceConnectionsQueueAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public UploadServiceConnectionsAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(context);
 
         View view = inflater.inflate(R.layout.download_recyclerview_layout, parent, false);
@@ -51,21 +44,11 @@ public class HomeServiceConnectionsQueueAdapter extends RecyclerView.Adapter<Hom
     }
 
     @Override
-    public void onBindViewHolder(@NonNull HomeServiceConnectionsQueueAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull UploadServiceConnectionsAdapter.ViewHolder holder, int position) {
         ServiceConnections serviceConnections = serviceConnectionsList.get(position);
 
         DisplayDetails displayDetails = new DisplayDetails(serviceConnections, holder);
         displayDetails.execute();
-
-        holder.downloadableParent.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(context, UpdateServiceConnectionsActivity.class);
-                intent.putExtra("SCID", serviceConnections.getId());
-                intent.putExtra("USERID", userId);
-                context.startActivity(intent);
-            }
-        });
     }
 
     @Override
@@ -76,7 +59,6 @@ public class HomeServiceConnectionsQueueAdapter extends RecyclerView.Adapter<Hom
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         public TextView serviceAccountName, serviceAccountAddress, serviceAccountId;
-        public CoordinatorLayout downloadableParent;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -84,18 +66,17 @@ public class HomeServiceConnectionsQueueAdapter extends RecyclerView.Adapter<Hom
             serviceAccountName = itemView.findViewById(R.id.serviceAccountName);
             serviceAccountAddress = itemView.findViewById(R.id.serviceAccountAddress);
             serviceAccountId = itemView.findViewById(R.id.serviceAccountId);
-            downloadableParent = itemView.findViewById(R.id.downloadableParent);
         }
     }
 
     class DisplayDetails extends AsyncTask<Void, Void, String> {
 
         ServiceConnections serviceConnections;
-        HomeServiceConnectionsQueueAdapter.ViewHolder holder;
+        UploadServiceConnectionsAdapter.ViewHolder holder;
 
         String town, barangay;
 
-        public DisplayDetails(ServiceConnections serviceConnections, HomeServiceConnectionsQueueAdapter.ViewHolder holder) {
+        public DisplayDetails(ServiceConnections serviceConnections, UploadServiceConnectionsAdapter.ViewHolder holder) {
             this.serviceConnections = serviceConnections;
             this.holder = holder;
         }
@@ -119,17 +100,6 @@ public class HomeServiceConnectionsQueueAdapter extends RecyclerView.Adapter<Hom
             holder.serviceAccountName.setText(serviceConnections.getServiceAccountName());
             holder.serviceAccountId.setText(serviceConnections.getId());
             holder.serviceAccountAddress.setText((null==barangay ? serviceConnections.getBarangay() : barangay) + ", " + (null==town ? serviceConnections.getTown() : town));
-
-            if (serviceConnections.getStatus().equals("Energized")) {
-                holder.serviceAccountName.setCompoundDrawablesWithIntrinsicBounds(null, null, context.getResources().getDrawable(R.drawable.ic_round_check_circle_18), null);
-                holder.serviceAccountName.setCompoundDrawablePadding(10);
-            } else if (serviceConnections.getStatus().equals("Not Energized")) {
-                holder.serviceAccountName.setCompoundDrawablesWithIntrinsicBounds(null, null, context.getResources().getDrawable(R.drawable.ic_round_error_18), null);
-                holder.serviceAccountName.setCompoundDrawablePadding(10);
-            } else {
-                holder.serviceAccountName.setCompoundDrawablesWithIntrinsicBounds(null, null, context.getResources().getDrawable(R.drawable.ic_baseline_info_18), null);
-                holder.serviceAccountName.setCompoundDrawablePadding(10);
-            }
             super.onPostExecute(s);
         }
     }

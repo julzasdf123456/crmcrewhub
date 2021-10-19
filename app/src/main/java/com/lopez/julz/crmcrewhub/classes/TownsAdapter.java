@@ -43,8 +43,13 @@ public class TownsAdapter extends RecyclerView.Adapter<TownsAdapter.ViewHolder> 
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Towns town = townsList.get(position);
 
-        holder.townName.setText(town.getTown());
-        holder.district.setText("District " + town.getDistrict());
+        holder.townName.setText("(" + town.getId() + ") " + town.getTown());
+        if (town.getDistrict() != null) {
+            holder.district.setText("District " + town.getDistrict());
+        } else {
+            holder.district.setText("No district specified");
+        }
+
         holder.townParent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

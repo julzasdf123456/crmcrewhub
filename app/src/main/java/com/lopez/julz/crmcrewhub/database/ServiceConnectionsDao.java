@@ -30,4 +30,7 @@ public interface ServiceConnectionsDao {
 
     @Query("DELETE FROM ServiceConnections WHERE id = :id")
     void deleteOne(String id);
+
+    @Query("SELECT * FROM ServiceConnections WHERE Status='Energized' AND (DateTimeOfEnergization IS NOT NULL OR DateTimeOfEnergization != '') AND (DateTimeLinemenArrived IS NOT NULL OR DateTimeLinemenArrived != '')")
+    List<ServiceConnections> getEnergized();
 }

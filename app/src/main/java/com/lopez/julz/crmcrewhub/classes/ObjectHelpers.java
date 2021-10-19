@@ -38,6 +38,15 @@ public class ObjectHelpers {
         }
     }
 
+    public static String getTimeInMillis() {
+        try {
+            return new Date().getTime() + "";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public static String getSelectedTextFromRadioGroup(RadioGroup rg, View view) {
         try {
             int selectedId = rg.getCheckedRadioButtonId();
