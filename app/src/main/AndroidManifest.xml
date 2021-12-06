@@ -19,6 +19,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CRMCrewHub">
         <activity
+            android:name=".UpdateTicketActivity"
+            android:exported="true" />
+        <activity
+            android:name=".LoginSettingsActivity"
+            android:exported="true" />
+        <activity
+            android:name=".TicketsRepositoryActivity"
+            android:exported="true" />
+        <activity
             android:name=".UploadActivity"
             android:exported="true" />
         <activity

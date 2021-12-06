@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">CRM Crew Hub</string>
     <string name="mapbox_access_token">pk.eyJ1IjoianVsemxvcGV6IiwiYSI6ImNqZzJ5cWdsMjJid3Ayd2xsaHcwdGhheW8ifQ.BcTcaOXmXNLxdO3wfXaf5A</string>
-    <string name="mapbox_style">"mapbox://styles/julzlopez/ckahntemo048l1il7edks77wb"</string>
+    <string name="mapbox_style">mapbox://styles/julzlopez/ckavvidmh61bt1iqp2n1ilgec</string>
+    <string name="admin_pw">2419</string>
 </resources>

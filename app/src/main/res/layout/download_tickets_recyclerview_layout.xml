@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp"
+    android:clickable="true"
+    android:id="@+id/ticketParent"
+    android:background="?android:selectableItemBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/ticket"
+            android:layout_width="wrap_content"
+            android:text="Ticket Name"
+            style="@style/TextAppearance.AppCompat.Subhead"
+            android:textColor="@color/primary_700"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/consumerName"
+            android:layout_width="wrap_content"
+            android:text="Juan De La Cruz"
+            android:textColor="@color/black"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/consumerAddress"
+            android:layout_width="wrap_content"
+            android:text="Barangay, Town"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/accountNumber"
+            android:layout_width="wrap_content"
+            android:text="Account No"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

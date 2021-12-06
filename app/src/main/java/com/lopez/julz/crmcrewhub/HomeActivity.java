@@ -2,6 +2,9 @@ package com.lopez.julz.crmcrewhub;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
+import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.InputType;
@@ -27,6 +30,7 @@ import com.lopez.julz.crmcrewhub.classes.Barangays;
 import com.lopez.julz.crmcrewhub.classes.ConsumerInfo;
 import com.lopez.julz.crmcrewhub.classes.HomeServiceConnectionsQueueAdapter;
 import com.lopez.julz.crmcrewhub.classes.ObjectHelpers;
+import com.lopez.julz.crmcrewhub.classes.TicketsHomeAdapter;
 import com.lopez.julz.crmcrewhub.classes.Towns;
 import com.lopez.julz.crmcrewhub.database.AppDatabase;
 import com.lopez.julz.crmcrewhub.database.BarangaysDao;
@@ -34,10 +38,16 @@ import com.lopez.julz.crmcrewhub.database.ServiceConnectionInspections;
 import com.lopez.julz.crmcrewhub.database.ServiceConnectionInspectionsDao;
 import com.lopez.julz.crmcrewhub.database.ServiceConnections;
 import com.lopez.julz.crmcrewhub.database.ServiceConnectionsDao;
+import com.lopez.julz.crmcrewhub.database.TicketRepositories;
+import com.lopez.julz.crmcrewhub.database.TicketRepositoriesDao;
+import com.lopez.julz.crmcrewhub.database.Tickets;
+import com.lopez.julz.crmcrewhub.database.TicketsDao;
 import com.lopez.julz.crmcrewhub.database.TownsDao;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.location.LocationComponent;
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions;
@@ -77,10 +87,21 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
 
     public AppDatabase db;
 
-    public RecyclerView recyclerviewHome;
+    /**
+     * SERVICE CONNECTIONS
+     */
+    public RecyclerView recyclerviewScHome;
     public List<ServiceConnections> serviceConnectionsList;
     public HomeServiceConnectionsQueueAdapter homeServiceConnectionsQueueAdapter;
     public TextView scQueueTitle;
+
+    /**
+     * TICKETS
+     */
+    public RecyclerView recyclerviewTicketsHome;
+    public List<Tickets> ticketsList;
+    public TicketsHomeAdapter ticketsHomeAdapter;
+    public TextView ticketsQueueTitle;
 
     // mapbox markers from active queue
     public List<ServiceConnectionInspections> inspectionsList;
@@ -89,7 +110,10 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
 
     public SymbolManager symbolManager;
 
-    public String userId;
+    /**
+     * CONFIG VALUES
+     */
+    public String userId, crew;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,6 +122,7 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
         setContentView(R.layout.activity_home);
 
         userId = getIntent().getExtras().getString("USERID");
+        crew = getIntent().getExtras().getString("CREW");
 
         retrofitBuilder = new RetrofitBuilder();
         requestPlaceHolder = retrofitBuilder.getRetrofit().create(RequestPlaceHolder.class);
@@ -118,18 +143,34 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
         archive = (ImageButton) findViewById(R.id.archive);
         refreshAll = findViewById(R.id.refreshAll);
 
-        // recyclerview
-        recyclerviewHome = findViewById(R.id.recyclerviewHome);
+        /**
+         * Service Connections
+         */
+        recyclerviewScHome = findViewById(R.id.recyclerviewScHome);
         scQueueTitle = findViewById(R.id.scQueueTitle);
         serviceConnectionsList = new ArrayList<>();
         inspectionsList = new ArrayList<>();
         homeServiceConnectionsQueueAdapter = new HomeServiceConnectionsQueueAdapter(serviceConnectionsList, this, userId);
-        recyclerviewHome.setAdapter(homeServiceConnectionsQueueAdapter);
-        recyclerviewHome.setLayoutManager(new LinearLayoutManager(this));
+        recyclerviewScHome.setAdapter(homeServiceConnectionsQueueAdapter);
+        recyclerviewScHome.setLayoutManager(new LinearLayoutManager(this));
+
+
+        /**
+         * Tickets
+         */
+        ticketsQueueTitle = findViewById(R.id.ticketsQueueTitle);
+        recyclerviewTicketsHome = findViewById(R.id.recyclerviewTicketsHome);
+        ticketsList = new ArrayList<>();
+        ticketsHomeAdapter = new TicketsHomeAdapter(ticketsList, this);
+        recyclerviewTicketsHome.setAdapter(ticketsHomeAdapter);
+        recyclerviewTicketsHome.setLayoutManager(new LinearLayoutManager(this));
+
+        selectTab(scQueueTitle, ticketsQueueTitle, recyclerviewScHome, recyclerviewTicketsHome);
 
         // DOWNLOAD ASSETS
         downloadTownsBackground();
         downloadBarangaysBackground();
+        downloadTicketRepos();
 
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -142,7 +183,10 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
         download.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(HomeActivity.this, DownloadActivity.class));
+                Intent intent = new Intent(HomeActivity.this, DownloadActivity.class);
+                intent.putExtra("USERID", userId);
+                intent.putExtra("CREW", crew);
+                startActivity(intent);
             }
         });
 
@@ -157,6 +201,7 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
             @Override
             public void onClick(View v) {
                 new FetchQueuedServiceConnections().execute();
+                new FetchTickets().execute();
             }
         });
 
@@ -166,6 +211,30 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
                 startActivity(new Intent(HomeActivity.this, UploadActivity.class));
             }
         });
+
+        scQueueTitle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectTab(scQueueTitle, ticketsQueueTitle, recyclerviewScHome, recyclerviewTicketsHome);
+            }
+        });
+
+        ticketsQueueTitle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectTab(ticketsQueueTitle, scQueueTitle, recyclerviewTicketsHome, recyclerviewScHome);
+            }
+        });
+    }
+
+    public void selectTab(@NonNull TextView active, TextView previous, View showView, View hideView) {
+        active.setTextColor(getResources().getColor(R.color.secondary_500));
+        active.setTypeface(active.getTypeface(), Typeface.BOLD);
+        previous.setTextColor(getResources().getColor(android.R.color.tab_indicator_text));
+        previous.setTypeface(null, Typeface.NORMAL);
+
+        showView.setVisibility(View.VISIBLE);
+        hideView.setVisibility(View.GONE);
     }
 
     @Override
@@ -204,8 +273,46 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
                     setStyle(style);
                     // initialize queues
                     new FetchQueuedServiceConnections().execute();
+                    new FetchTickets().execute();
 
                     enableLocationComponent(style);
+
+                    /**
+                     * UPDATE SERVICE CONNECION LOCATION ON MAP
+                     */
+                    homeServiceConnectionsQueueAdapter.setShowOnMap(new HomeServiceConnectionsQueueAdapter.ShowOnMap() {
+                        @Override
+                        public void showLoc(int position) {
+                            new MoveCameraMapToServiceConnection().execute(position);
+                        }
+                    });
+
+                    /**
+                     * UPDATE TICKET LOCATION ON MAP
+                     */
+
+                    ticketsHomeAdapter.setMapViewListener(new TicketsHomeAdapter.MapViewListener() {
+                        @Override
+                        public void changeLocation(int position) {
+                            if (ticketsList.get(position).getGeoLocation() != null) {
+                                Double ticketLat = Double.valueOf(ticketsList.get(position).getGeoLocation().split(",")[0]);
+                                Double ticketLong = Double.valueOf(ticketsList.get(position).getGeoLocation().split(",")[1].trim());
+                                CameraPosition cameraPosition = new CameraPosition.Builder()
+                                        .target(new LatLng(ticketLat, ticketLong))      // Sets the center of the map to Mountain View
+                                        .zoom(13)                      // Sets the tilt of the camera to 30 degrees
+                                        .build();
+
+                                if (mapboxMap != null) {
+                                    mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 1200);
+                                } else {
+                                    Toast.makeText(HomeActivity.this, "Map is still loading, try again in a couple of seconds", Toast.LENGTH_LONG).show();
+                                }
+                            } else {
+                                Toast.makeText(HomeActivity.this, "No Geo Location recorded for this ticket", Toast.LENGTH_LONG).show();
+                            }
+
+                        }
+                    });
                 }
             });
         } catch (Exception e) {
@@ -231,7 +338,62 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
         }
     }
 
-    public void addMarkers(Style style) {
+    public void addTicketMarkers(Style style) {
+        try {
+            // ADD MARKERS
+            symbolManager = new SymbolManager(mapView, mapboxMap, style);
+
+            symbolManager.setIconAllowOverlap(true);
+            symbolManager.setTextAllowOverlap(true);
+
+            if (ticketsList != null) {
+                int totalMakers = ticketsList.size();
+
+                for(int i=0; i<totalMakers; i++) {
+                    Tickets tickets = ticketsList.get(i);
+                    if (tickets.getGeoLocation() != null) {
+                        Double ticketLat = Double.valueOf(ticketsList.get(i).getGeoLocation().split(",")[0].trim());
+                        Double ticketLong = Double.valueOf(ticketsList.get(i).getGeoLocation().split(",")[1].trim());
+
+                        SymbolOptions symbolOptions = new SymbolOptions()
+                                .withLatLng(new LatLng(ticketLat, ticketLong))
+                                .withData(new JsonParser().parse("{" +
+                                        "'id' : '" + tickets.getId() + "'," +
+                                        "'ticketId' : '" + tickets.getId() + "'}"))
+                                .withIconImage("tw-provincial-2")
+                                .withIconSize(.35f);
+
+                        Symbol symbol = symbolManager.create(symbolOptions);
+                    }
+                }
+            }
+
+            symbolManager.addClickListener(new OnSymbolClickListener() {
+                @Override
+                public boolean onAnnotationClick(Symbol symbol) {
+//                    Toast.makeText(HomeActivity.this, symbol.getData().getAsJsonObject().get("scId").getAsString(), Toast.LENGTH_LONG).show();
+//                    Intent intent = new Intent(HomeActivity.this, UpdateServiceConnectionsActivity.class);
+//                    intent.putExtra("SCID", symbol.getData().getAsJsonObject().get("scId").getAsString());
+//                    intent.putExtra("INSP_ID", symbol.getData().getAsJsonObject().get("id").getAsString());
+//                    intent.putExtra("USERID", userId);
+//                    startActivity(intent);
+                    return false;
+                }
+            });
+
+            symbolManager.addLongClickListener(new OnSymbolLongClickListener() {
+                @Override
+                public boolean onAnnotationLongClick(Symbol symbol) {
+                    new FetchTicketInfo().execute(symbol.getData().getAsJsonObject().get("ticketId").getAsString());
+                    return false;
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addServiceConnectionMarkers(Style style) {
         try {
             // ADD MARKERS
             symbolManager = new SymbolManager(mapView, mapboxMap, style);
@@ -253,8 +415,8 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
                                 .withData(new JsonParser().parse("{" +
                                                                             "'id' : '" + insp.getId() + "'," +
                                                                             "'scId' : '" + insp.getServiceConnectionId() + "'}"))
-                                .withIconImage("place-black-24dp")
-                                .withIconSize(1.3f);
+                                .withIconImage("tw-provincial-expy-2")
+                                .withIconSize(.35f);
 
                         Symbol symbol = symbolManager.create(symbolOptions);
                     }
@@ -334,6 +496,7 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
         super.onResume();
         mapView.onResume();
         new FetchQueuedServiceConnections().execute();
+        new FetchTickets().execute();
     }
 
     @Override
@@ -366,6 +529,9 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
         mapView.onLowMemory();
     }
 
+    /**
+     * SERVICE CONNECTIONS
+     */
     public void downloadTownsBackground() {
         try {
             Call<List<Towns>> townsCall = requestPlaceHolder.getTowns();
@@ -406,16 +572,6 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
 
         @Override
         protected Void doInBackground(List<Towns>... lists) {
-//            ServiceConnectionsDao serviceConnectionsDao = db.serviceConnectionsDao();
-//            serviceConnectionsDao.deleteAll();
-//            ServiceConnectionInspectionsDao serviceConnectionInspectionsDao = db.serviceConnectionInspectionsDao();
-//            serviceConnectionInspectionsDao.deleteAll();
-//            BarangaysDao barangaysDao = db.barangaysDao();
-//            List<Barangays> list = barangaysDao.getAll();
-//            for (int i=0; i<list.size(); i++) {
-//                Log.e("ERR", list.get(i).getBarangay() + " - " + list.get(i).getTownId());
-//            }
-
             List<Towns> towns = lists[0];
             int count = towns.size();
 
@@ -579,7 +735,7 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
             if (symbolManager != null) {
                 symbolManager.deleteAll();
             }
-            addMarkers(style);
+            addServiceConnectionMarkers(style);
         }
     }
 
@@ -627,5 +783,187 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
         }
     }
 
+    public class MoveCameraMapToServiceConnection extends AsyncTask<Integer, Void, Void> {
+
+        private ServiceConnectionInspections inspections;
+
+        @Override
+        protected Void doInBackground(Integer... integers) {
+            try {
+                inspections = db.serviceConnectionInspectionsDao().getOneByServiceConnectionId(serviceConnectionsList.get(integers[0]).getId());
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void unused) {
+            super.onPostExecute(unused);
+
+            if (inspections != null) {
+                if (getLatLongFromInspections(inspections) != null | !getLatLongFromInspections(inspections).equals("")) {
+                    Double lati = Double.valueOf(getLatLongFromInspections(inspections).split(",")[0]);
+                    Double longi = Double.valueOf(getLatLongFromInspections(inspections).split(",")[1]);
+
+                    CameraPosition cameraPosition = new CameraPosition.Builder()
+                            .target(new LatLng(lati, longi))      // Sets the center of the map to Mountain View
+                            .zoom(13)                      // Sets the tilt of the camera to 30 degrees
+                            .build();
+
+                    if (mapboxMap != null) {
+                        mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 1200);
+                    } else {
+                        Toast.makeText(HomeActivity.this, "Map is still loading, try again in a couple of seconds", Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(HomeActivity.this, "No Geo Location recorded for this ticket", Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+    }
+
+    /**
+     * TICKETS
+     */
+    public void downloadTicketRepos() {
+        try {
+            Call<List<TicketRepositories>> ticketRepCall = requestPlaceHolder.getTicketTypes();
+
+            ticketRepCall.enqueue(new Callback<List<TicketRepositories>>() {
+                @Override
+                public void onResponse(Call<List<TicketRepositories>> call, Response<List<TicketRepositories>> response) {
+                    if (!response.isSuccessful()) {
+                        Log.e("ERR_DWNL_TCKT_REP", response.message() + "\n" + response.errorBody());
+                    } else {
+                        if (response.code() == 200) {
+                            new SaveTicketRepositories().execute(response.body());
+                        } else {
+                            Log.e("ERR_DWNL_TCKT_REP", response.message() + "\n" + response.errorBody());
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<List<TicketRepositories>> call, Throwable t) {
+
+                }
+            });
+        } catch (Exception e) {
+            Log.e("ERR_DWNL_TCKT_REP", e.getMessage());
+        }
+    }
+
+    public class SaveTicketRepositories extends AsyncTask<List<TicketRepositories>, Void, Void> {
+
+        @Override
+        protected Void doInBackground(List<TicketRepositories>... lists) {
+            try {
+                if (lists != null) {
+                    TicketRepositoriesDao ticketRepositoriesDao = db.ticketRepositoriesDao();
+
+                    List<TicketRepositories> ticketRepositoriesList = lists[0];
+
+                    int size = ticketRepositoriesList.size();
+
+                    for (int i=0; i<size; i++) {
+                        TicketRepositories ticketRepository = ticketRepositoriesDao.getOne(ticketRepositoriesList.get(i).getId());
+
+                        if (ticketRepository != null) {
+
+                        } else {
+                            ticketRepositoriesDao.insertAll(ticketRepositoriesList.get(i));
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                Log.e("ERR_SV_TCT_REP", e.getMessage());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void unused) {
+            super.onPostExecute(unused);
+            Log.e("TICKT_SVD", "All ticket repositories downloaded");
+        }
+    }
+
+    public class FetchTickets extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            ticketsList.clear();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            try {
+                TicketsDao ticketsDao = db.ticketsDao();
+
+                ticketsList.addAll(ticketsDao.getAll());
+            } catch (Exception e) {
+                Log.e("ERR_FETCH_TCKTS", e.getMessage());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void unused) {
+            super.onPostExecute(unused);
+            ticketsHomeAdapter.notifyDataSetChanged();
+            ticketsQueueTitle.setText("Tickets/Complains (" + ticketsList.size() + ")");
+
+            addTicketMarkers(style);
+        }
+    }
+
+    public class FetchTicketInfo extends AsyncTask<String, Void, Void> {
+
+        private Tickets ticket;
+        private String town, barangay, ticketName, parentTicket;
+
+        @Override
+        protected Void doInBackground(String... strings) {
+            try {
+                TicketsDao ticketsDao = db.ticketsDao();
+
+                ticket = ticketsDao.getOne(strings[0]);
+                town = db.townsDao().getOne(ticket.getTown()).getTown();
+                barangay = db.barangaysDao().getOne(ticket.getBarangay()).getBarangay();
+
+                TicketRepositories ticketRepository = db.ticketRepositoriesDao().getOne(ticket.getTicket());
+                ticketName = ticketRepository.getName();
+                parentTicket = db.ticketRepositoriesDao().getOne(ticketRepository.getParentTicket()).getName();
+            } catch (Exception e) {
+                Log.e("ERR_GET_TCKT_INF", e.getMessage());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void unused) {
+            super.onPostExecute(unused);
+
+            if (ticket != null) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(HomeActivity.this);
+
+                builder.setTitle(ticket.getConsumerName());
+                builder.setMessage(ticket.getSitio() + ", " + barangay + ", " + town + "\n" + parentTicket + " - " + ticketName);
+
+                builder.setNegativeButton("Close", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+                AlertDialog dialog = builder.create();
+
+                dialog.show();
+            }
+        }
+    }
 
 }

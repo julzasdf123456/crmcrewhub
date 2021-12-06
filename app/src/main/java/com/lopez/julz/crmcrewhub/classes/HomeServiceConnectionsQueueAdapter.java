@@ -4,11 +4,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
@@ -29,6 +31,7 @@ public class HomeServiceConnectionsQueueAdapter extends RecyclerView.Adapter<Hom
     public List<ServiceConnections> serviceConnectionsList;
     public String userId;
     public AppDatabase db;
+    private ShowOnMap showOnMap;
 
     public HomeServiceConnectionsQueueAdapter(List<ServiceConnections> serviceConnectionsList, Context context, String userId) {
         this.serviceConnectionsList = serviceConnectionsList;
@@ -36,6 +39,14 @@ public class HomeServiceConnectionsQueueAdapter extends RecyclerView.Adapter<Hom
         this.userId = userId;
         db = Room.databaseBuilder(context,
                 AppDatabase.class, ObjectHelpers.databaseName()).fallbackToDestructiveMigration().build();
+    }
+
+    public void setShowOnMap(ShowOnMap showOnMap) {
+        this.showOnMap = showOnMap;
+    }
+
+    public interface ShowOnMap {
+        public void showLoc(int position);
     }
 
     @NonNull
@@ -85,6 +96,36 @@ public class HomeServiceConnectionsQueueAdapter extends RecyclerView.Adapter<Hom
             serviceAccountAddress = itemView.findViewById(R.id.serviceAccountAddress);
             serviceAccountId = itemView.findViewById(R.id.serviceAccountId);
             downloadableParent = itemView.findViewById(R.id.downloadableParent);
+
+            downloadableParent.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    PopupMenu popup = new PopupMenu(context, downloadableParent);
+                    //inflating menu from xml resource
+                    popup.inflate(R.menu.home_ticket_recyclerview_menu);
+                    //adding click listener
+                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+                            switch (item.getItemId()) {
+                                case R.id.locate_ticket:
+                                    if (showOnMap != null) {
+                                        showOnMap.showLoc(getAdapterPosition());
+                                    }
+                                    return true;
+                                case R.id.delete_ticket:
+                                    //handle menu2 click
+                                    return true;
+                                default:
+                                    return false;
+                            }
+                        }
+                    });
+                    //displaying the popup
+                    popup.show();
+                    return false;
+                }
+            });
         }
     }
 

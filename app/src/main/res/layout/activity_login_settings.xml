@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SettingsActivity">
+    tools:context=".LoginSettingsActivity">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -17,7 +17,7 @@
             android:orientation="vertical">
 
             <androidx.appcompat.widget.Toolbar
-                android:id="@+id/settingsToolbar"
+                android:id="@+id/settingsLoginToolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:elevation="3dp">
@@ -25,7 +25,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Settings and Others"
+                    android:text="Settings"
                     style="@style/TextAppearance.AppCompat.Title"/>
 
             </androidx.appcompat.widget.Toolbar>
@@ -39,31 +39,13 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Others"/>
+                    android:text="Crew"/>
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/townsMenuBtn"
+                <Spinner
+                    android:id="@+id/selectCrew"
+                    android:layout_marginTop="10dp"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Towns and Barangays"
-                    android:textAlignment="textStart"
-                    style="@style/TextAppearance.AppCompat.Widget.Button.Borderless.Colored"
-                    android:background="?android:selectableItemBackground"
-                    android:textColor="@color/black"
-                    android:drawableRight="@drawable/ic_round_arrow_forward_ios_24"
-                    android:drawableLeft="@drawable/ic_round_location_on_24"/>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/ticketRepositories"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Ticket Types"
-                    android:textAlignment="textStart"
-                    style="@style/TextAppearance.AppCompat.Widget.Button.Borderless.Colored"
-                    android:background="?android:selectableItemBackground"
-                    android:textColor="@color/black"
-                    android:drawableRight="@drawable/ic_round_arrow_forward_ios_24"
-                    android:drawableLeft="@drawable/ic_baseline_playlist_add_check_24"/>
+                    android:layout_height="wrap_content"></Spinner>
 
             </LinearLayout>
         </LinearLayout>

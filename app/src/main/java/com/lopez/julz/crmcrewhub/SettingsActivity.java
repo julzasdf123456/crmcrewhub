@@ -15,7 +15,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     Toolbar settingsToolbar;
 
-    public MaterialButton townsMenuBtn;
+    public MaterialButton townsMenuBtn, ticketRepositories;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,11 +31,19 @@ public class SettingsActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         townsMenuBtn = (MaterialButton) findViewById(R.id.townsMenuBtn);
+        ticketRepositories = findViewById(R.id.ticketRepositories);
 
         townsMenuBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(SettingsActivity.this, TownsActivity.class));
+            }
+        });
+
+        ticketRepositories.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(SettingsActivity.this, TicketsRepositoryActivity.class));
             }
         });
     }

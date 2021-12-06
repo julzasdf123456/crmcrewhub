@@ -19,12 +19,15 @@ import com.lopez.julz.crmcrewhub.api.RequestPlaceHolder;
 import com.lopez.julz.crmcrewhub.api.RetrofitBuilder;
 import com.lopez.julz.crmcrewhub.classes.AlertHelpers;
 import com.lopez.julz.crmcrewhub.classes.DownloadAdapter;
+import com.lopez.julz.crmcrewhub.classes.DownloadTicketsAdapter;
 import com.lopez.julz.crmcrewhub.classes.ObjectHelpers;
 import com.lopez.julz.crmcrewhub.database.AppDatabase;
 import com.lopez.julz.crmcrewhub.database.ServiceConnectionInspections;
 import com.lopez.julz.crmcrewhub.database.ServiceConnectionInspectionsDao;
 import com.lopez.julz.crmcrewhub.database.ServiceConnections;
 import com.lopez.julz.crmcrewhub.database.ServiceConnectionsDao;
+import com.lopez.julz.crmcrewhub.database.Tickets;
+import com.lopez.julz.crmcrewhub.database.TicketsDao;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,10 +41,20 @@ public class DownloadActivity extends AppCompatActivity {
     public CircularProgressIndicator downloadProgress;
     public SwipeRefreshLayout refresh;
 
+    /**
+     * SERVICE CONNECTIONS
+     */
     public RecyclerView downloadRecyclerView;
     public DownloadAdapter downloadAdapter;
     public List<ServiceConnections> serviceConnectionsList;
     public List<ServiceConnectionInspections> serviceConnectionInspectionsList;
+
+    /**
+     * TICKETS
+     */
+    public RecyclerView downloadRecyclerViewTickets;
+    public List<Tickets> ticketsList;
+    public DownloadTicketsAdapter downloadTicketsAdapter;
 
     public RetrofitBuilder retrofitBuilder;
     private RequestPlaceHolder requestPlaceHolder;
@@ -52,16 +65,12 @@ public class DownloadActivity extends AppCompatActivity {
 
     public AppDatabase db;
 
+    public String userId, crew;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_download);
-
-        downloadProgress = (CircularProgressIndicator) findViewById(R.id.downloadProgress);
-        downloadRecyclerView = (RecyclerView) findViewById(R.id.downloadRecyclerViewServiceConnections);
-        refresh = (SwipeRefreshLayout) findViewById(R.id.refresh);
-        scCount = (TextView) findViewById(R.id.scCount);
-        downloadDataBtn = findViewById(R.id.downloadDataBtn);
 
         db = Room.databaseBuilder(this,
                 AppDatabase.class, ObjectHelpers.databaseName()).fallbackToDestructiveMigration().build();
@@ -69,18 +78,41 @@ public class DownloadActivity extends AppCompatActivity {
         retrofitBuilder = new RetrofitBuilder();
         requestPlaceHolder = retrofitBuilder.getRetrofit().create(RequestPlaceHolder.class);
 
+        userId = getIntent().getExtras().getString("USERID");
+        crew = getIntent().getExtras().getString("CREW");
+
+        /**
+         * SERVICE CONNECTIONS
+         */
+        downloadProgress = (CircularProgressIndicator) findViewById(R.id.downloadProgress);
+        downloadRecyclerView = (RecyclerView) findViewById(R.id.downloadRecyclerViewServiceConnections);
+        refresh = (SwipeRefreshLayout) findViewById(R.id.refresh);
+        scCount = (TextView) findViewById(R.id.scCount);
+        downloadDataBtn = findViewById(R.id.downloadDataBtn);
+
         serviceConnectionsList = new ArrayList<>();
         serviceConnectionInspectionsList = new ArrayList<>();
         downloadAdapter = new DownloadAdapter(serviceConnectionsList, this);
         downloadRecyclerView.setAdapter(downloadAdapter);
         downloadRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        fetchDownloadables();
+        /**
+         * TICKETS
+         */
+        downloadRecyclerViewTickets = findViewById(R.id.downloadRecyclerViewTickets);
+        ticketsList = new ArrayList<>();
+        downloadTicketsAdapter = new DownloadTicketsAdapter(ticketsList, this);
+        downloadRecyclerViewTickets.setAdapter(downloadTicketsAdapter);
+        downloadRecyclerViewTickets.setLayoutManager(new LinearLayoutManager(this));
+
+        fetchDownloadableServiceConnections();
+        fetchDownloadableTickets();
 
         refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                fetchDownloadables();
+                fetchDownloadableServiceConnections();
+                fetchDownloadableTickets();
             }
         });
 
@@ -92,12 +124,19 @@ public class DownloadActivity extends AppCompatActivity {
                 } else {
                     new DownloadServiceConnections().execute(serviceConnectionsList);
                     new DownloadInspections().execute(serviceConnectionInspectionsList);
+                    new DownloadTickets().execute();
                 }
             }
         });
     }
 
-    public void fetchDownloadables() {
+
+    /**
+     * _________________________________________________
+     * SERVICE CONNECTIONS
+     * __________________________________________________
+     */
+    public void fetchDownloadableServiceConnections() {
         try {
             /**
              * Call downloadables from ServiceConnections
@@ -253,6 +292,135 @@ public class DownloadActivity extends AppCompatActivity {
                 serviceConnectionInspectionsDao.insertAll(serviceConnectionInspections.get(i));
             }
             return null;
+        }
+    }
+
+    /**
+     * ______________________________________
+     * TICKETS
+     * ___________________________________
+     */
+    public void fetchDownloadableTickets() {
+        try {
+            Call<List<Tickets>> ticketsCall = requestPlaceHolder.getDownloadbleTickets(crew);
+
+            ticketsCall.enqueue(new Callback<List<Tickets>>() {
+                @Override
+                public void onResponse(Call<List<Tickets>> call, Response<List<Tickets>> response) {
+                    if (!response.isSuccessful()) {
+                        Log.e("ERR_GET_DWNDBL_TCKTS", response.message() + ", " + response.errorBody());
+                    } else {
+                        if (response.code() == 200) {
+                            new AssessDownloadableTickets().execute(response.body());
+                        } else {
+                            Log.e("ERR_GET_DWNDBL_TCKTS", response.message() + ", " + response.errorBody());
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<List<Tickets>> call, Throwable t) {
+
+                }
+            });
+        } catch (Exception e) {
+            Log.e("ERR_GET_DWNDBL_TCKTS", e.getMessage());
+        }
+    }
+
+    public class AssessDownloadableTickets extends AsyncTask<List<Tickets>, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            ticketsList.clear();
+        }
+
+        @Override
+        protected Void doInBackground(List<Tickets>... lists) {
+            try {
+                TicketsDao ticketsDao = db.ticketsDao();
+
+                if (lists != null) {
+                    List<Tickets> tickets = lists[0];
+
+                    int size = tickets.size();
+
+                    for (int i=0; i<size; i++) {
+                        Tickets dbTicket = ticketsDao.getOne(tickets.get(i).getId());
+
+                        if (dbTicket != null) {
+                            // skip
+                        } else {
+                            ticketsList.add(tickets.get(i));
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                Log.e("ERR_ASSESS_DWNDBL_TCKT", e.getMessage());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void unused) {
+            super.onPostExecute(unused);
+            downloadTicketsAdapter.notifyDataSetChanged();
+        }
+    }
+
+    public class DownloadTickets extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            try {
+                TicketsDao ticketsDao = db.ticketsDao();
+
+                int size = ticketsList.size();
+
+                for (int i=0; i<size; i++) {
+                    ticketsDao.insertAll(ticketsList.get(i));
+                }
+            } catch (Exception e) {
+                Log.e("ERR_SAVE_TICKETS", e.getMessage());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void unused) {
+            super.onPostExecute(unused);
+            ticketsList.clear();
+            downloadTicketsAdapter.notifyDataSetChanged();
+            updateDownloadStatus();
+        }
+    }
+
+    public void updateDownloadStatus() {
+        try {
+            Call<Void> updateCall = requestPlaceHolder.updateDownloadedStatus(crew, userId);
+
+            updateCall.enqueue(new Callback<Void>() {
+                @Override
+                public void onResponse(Call<Void> call, Response<Void> response) {
+                    if (!response.isSuccessful()) {
+                        Log.e("ERR_SET_UPLD_STS", response.errorBody() + "");
+                    } else {
+                        if (response.code() == 200) {
+                            Toast.makeText(DownloadActivity.this, "All tickets downloaded!", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Log.e("ERR_SET_UPLD_STS", response.errorBody() + "");
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Void> call, Throwable t) {
+                    Log.e("ERR_SET_UPLD_STS", t.getMessage());
+                }
+            });
+        } catch (Exception e) {
+            Log.e("ERR_SET_UPLD_STS", e.getMessage());
         }
     }
 }

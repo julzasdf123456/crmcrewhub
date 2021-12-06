@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.button.MaterialButton;
@@ -25,9 +26,15 @@ import com.lopez.julz.crmcrewhub.api.RequestPlaceHolder;
 import com.lopez.julz.crmcrewhub.api.RetrofitBuilder;
 import com.lopez.julz.crmcrewhub.classes.Login;
 import com.lopez.julz.crmcrewhub.classes.ObjectHelpers;
+import com.lopez.julz.crmcrewhub.database.AppConfig;
+import com.lopez.julz.crmcrewhub.database.AppConfigDao;
 import com.lopez.julz.crmcrewhub.database.AppDatabase;
+import com.lopez.julz.crmcrewhub.database.Crew;
+import com.lopez.julz.crmcrewhub.database.CrewDao;
 import com.lopez.julz.crmcrewhub.database.Users;
 import com.lopez.julz.crmcrewhub.database.UsersDao;
+
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -41,7 +48,13 @@ public class LoginActivity extends AppCompatActivity {
     public RetrofitBuilder retrofitBuilder;
     private RequestPlaceHolder requestPlaceHolder;
 
+    private MaterialButton settingsBtn;
+
     public AppDatabase db;
+
+    public TextView configErrorMessage;
+
+    private String CREW = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,9 +67,15 @@ public class LoginActivity extends AppCompatActivity {
         db = Room.databaseBuilder(this,
                 AppDatabase.class, ObjectHelpers.databaseName()).fallbackToDestructiveMigration().build();
 
+        configErrorMessage = findViewById(R.id.configErrorMessage);
         username = (EditText) findViewById(R.id.username);
         password = (EditText) findViewById(R.id.password);
         loginBtn = (Button) findViewById(R.id.login);
+        settingsBtn = findViewById(R.id.settingsBtn);
+        loginBtn.setEnabled(false);
+        configErrorMessage.setVisibility(View.GONE);
+
+        getAllCrew();
 
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,11 +100,58 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
+
+        settingsBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+
+                    builder.setTitle("Enter Admin Password");
+
+                    EditText editText = new EditText(LoginActivity.this);
+                    editText.setInputType(InputType.TYPE_NUMBER_VARIATION_PASSWORD);
+
+                    builder.setView(editText);
+
+                    builder.setCancelable(false);
+
+                    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+
+                    builder.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (editText.getText().toString().equals(getResources().getString(R.string.admin_pw))) {
+                                startActivity(new Intent(LoginActivity.this, LoginSettingsActivity.class));
+                            } else {
+                                Toast.makeText(LoginActivity.this, "Admin password mismatch!", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+
+                    AlertDialog alertDialog = builder.create();
+
+                    alertDialog.show();
+                } catch (Exception e) {
+                    Log.e("ERR_STRT_PWD_DLG", e.getMessage());
+                }
+            }
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        new GetAppConfig().execute();
     }
 
     @Override
     public void onBackPressed() {
-//        super.onBackPressed();
         showAdminPasswordDialog();
     }
 
@@ -112,6 +178,7 @@ public class LoginActivity extends AppCompatActivity {
                         new SaveUser().execute(response.body().getId(), username.getText().toString(), password.getText().toString());
                         Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                         intent.putExtra("USERID", response.body().getId());
+                        intent.putExtra("CREW", CREW);
                         startActivity(intent);
                         finish();
                     } else {
@@ -172,6 +239,7 @@ public class LoginActivity extends AppCompatActivity {
             if (doesUserExists) {
                 Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                 intent.putExtra("USERID", userid);
+                intent.putExtra("CREW", CREW);
                 startActivity(intent);
             } else {
                 Toast.makeText(LoginActivity.this, "User not found on this device!", Toast.LENGTH_LONG).show();
@@ -202,7 +270,7 @@ public class LoginActivity extends AppCompatActivity {
             builder.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    if (editText.getText().toString().equals("2419")) {
+                    if (editText.getText().toString().equals(getResources().getString(R.string.admin_pw))) {
                         finish();
                     } else {
                         Toast.makeText(LoginActivity.this, "Admin password mismatch!", Toast.LENGTH_SHORT).show();
@@ -215,6 +283,102 @@ public class LoginActivity extends AppCompatActivity {
             alertDialog.show();
         } catch (Exception e) {
             Log.e("ERR_STRT_PWD_DLG", e.getMessage());
+        }
+    }
+
+    /**
+     * Download Crew
+     */
+    public void getAllCrew() {
+        try {
+            Call<List<Crew>> crewCall = requestPlaceHolder.getAllCrew();
+
+            crewCall.enqueue(new Callback<List<Crew>>() {
+                @Override
+                public void onResponse(Call<List<Crew>> call, Response<List<Crew>> response) {
+                    if (response.isSuccessful()) {
+                        if (response.code() == 200) {
+                            new SaveCrew().execute(response.body());
+                        } else {
+                            Log.e("ER_GET_CREW", response.errorBody() + "");
+                        }
+                    } else {
+                        Log.e("ER_GET_CREW", response.errorBody() + "");
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<List<Crew>> call, Throwable t) {
+                    Log.e("ER_GET_CREW", t.getMessage());
+                }
+            });
+        } catch (Exception e) {
+            Log.e("ER_GET_CREW", e.getMessage());
+        }
+    }
+
+    public class SaveCrew extends AsyncTask<List<Crew>, Void, Void> {
+
+        @Override
+        protected Void doInBackground(List<Crew>... lists) {
+            try {
+                CrewDao crewDao = db.crewDao();
+
+                if (lists != null) {
+                    List<Crew> crewList = lists[0];
+
+                    for (int i=0; i<crewList.size(); i++) {
+                        Crew crew = crewDao.getOne(crewList.get(i).getId());
+
+                        if (crew != null) {
+                            // skip
+                        } else {
+                            crewDao.insertAll(crewList.get(i));
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                Log.e("ERR_SV_CREW", e.getMessage());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void unused) {
+            super.onPostExecute(unused);
+            Log.e("ALL_CREW_DWNLDD", "All crew downloaded");
+        }
+    }
+
+    /**
+     * FETCH APP CONFIG
+     */
+    public class GetAppConfig extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            try {
+                AppConfigDao appConfigDao = db.appConfigDao();
+
+                AppConfig appConfig = appConfigDao.getConfig();
+
+                CREW = appConfig.getDeviceStation();
+            } catch (Exception e) {
+                Log.e("ERR_GET_CONFIG", e.getMessage());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void unused) {
+            super.onPostExecute(unused);
+            if (CREW != null) {
+                loginBtn.setEnabled(true);
+                configErrorMessage.setVisibility(View.GONE);
+            } else {
+                loginBtn.setEnabled(false);
+                configErrorMessage.setVisibility(View.VISIBLE);
+            }
         }
     }
 }

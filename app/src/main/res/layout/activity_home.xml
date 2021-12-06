@@ -21,11 +21,47 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/scQueueTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Sevice Connections"/>
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/scQueueTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Service Connections"
+                        android:layout_column="1"
+                        android:layout_weight="10"
+                        android:paddingTop="8dp"
+                        android:paddingLeft="5dp"
+                        android:paddingRight="5dp"
+                        android:paddingBottom="8dp"
+                        android:gravity="center"
+                        android:clickable="true"
+                        android:background="?android:selectableItemBackground"/>
+
+                    <TextView
+                        android:id="@+id/ticketsQueueTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tickets/Complains"
+                        android:layout_column="2"
+                        android:layout_weight="10"
+                        android:paddingTop="8dp"
+                        android:paddingLeft="5dp"
+                        android:paddingRight="5dp"
+                        android:paddingBottom="8dp"
+                        android:gravity="center"
+                        android:clickable="true"
+                        android:background="?android:selectableItemBackground"/>
+
+                </TableRow>
+
+            </TableLayout>
 
             <View
                 android:layout_width="match_parent"
@@ -35,7 +71,12 @@
                 android:layout_marginBottom="15dp"/>
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerviewHome"
+                android:id="@+id/recyclerviewScHome"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerviewTicketsHome"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
 
@@ -143,6 +184,6 @@
         android:id="@+id/mapViewForm"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:mapbox_cameraZoom="15" />
+        app:mapbox_cameraZoom="13" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
