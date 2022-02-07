@@ -165,6 +165,12 @@ public class TicketsHomeAdapter extends RecyclerView.Adapter<TicketsHomeAdapter.
             holder.consumerName.setText(consumername);
             holder.ticket.setText(ticketName);
 
+            if (ticket.getUploadStatus() != null && ticket.getUploadStatus().equals("UPLOADABLE")) {
+                holder.ticket.setCompoundDrawablesWithIntrinsicBounds(context.getResources().getDrawable(R.drawable.ic_round_check_circle_18), null, null, null);
+            } else {
+                holder.ticket.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
+            }
+
             holder.ticketParent.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

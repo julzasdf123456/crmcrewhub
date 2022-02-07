@@ -130,7 +130,6 @@ public class DownloadActivity extends AppCompatActivity {
         });
     }
 
-
     /**
      * _________________________________________________
      * SERVICE CONNECTIONS
@@ -276,6 +275,23 @@ public class DownloadActivity extends AppCompatActivity {
             super.onPostExecute(unused);
             Log.e("DOWNLOAD_FINISHED", "Download finished");
 
+            Call<Void> updateCall = requestPlaceHolder.updateDownloadedServiceConnectionStatus(crew, userId, "Downloaded by Crew");
+            updateCall.enqueue(new Callback<Void>() {
+                @Override
+                public void onResponse(Call<Void> call, Response<Void> response) {
+                    if (response.isSuccessful()) {
+                        Log.e("UPDTED_DWNLDED_SC", response.message());
+                    } else {
+                        Log.e("ERR_UPDT_DWNLDED_SC", response.raw() + "");
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Void> call, Throwable t) {
+                    Log.e("ERR_UPDT_DWNLDED_SC", t.getMessage());
+                }
+            });
+
             // show alert dialog
             AlertHelpers.showExitableInfoDialog(DownloadActivity.this, DownloadActivity.this, "Download finished!", "All data downloaded successfully!");
         }
@@ -404,12 +420,12 @@ public class DownloadActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call<Void> call, Response<Void> response) {
                     if (!response.isSuccessful()) {
-                        Log.e("ERR_SET_UPLD_STS", response.errorBody() + "");
+                        Log.e("ERR_SET_UPLD_STS", response.raw().toString());
                     } else {
                         if (response.code() == 200) {
                             Toast.makeText(DownloadActivity.this, "All tickets downloaded!", Toast.LENGTH_SHORT).show();
                         } else {
-                            Log.e("ERR_SET_UPLD_STS", response.errorBody() + "");
+                            Log.e("ERR_SET_UPLD_STS", response.raw().toString());
                         }
                     }
                 }

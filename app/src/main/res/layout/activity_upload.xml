@@ -47,13 +47,13 @@
                                 android:textColor="@color/black" />
 
                             <com.google.android.material.progressindicator.CircularProgressIndicator
+                                android:id="@+id/scProgressUpload"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:id="@+id/scProgressUpload"
                                 android:layout_alignParentRight="true"
-                                app:indicatorColor="@color/secondary_500"
                                 android:indeterminate="true"
-                                app:indicatorSize="20dp"/>
+                                app:indicatorColor="@color/secondary_500"
+                                app:indicatorSize="20dp" />
 
                         </RelativeLayout>
 
@@ -102,13 +102,13 @@
                                 android:gravity="center"/>
 
                             <com.google.android.material.progressindicator.CircularProgressIndicator
+                                android:id="@+id/ticketsProgressUpload"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:id="@+id/ticketsProgressUpload"
                                 android:layout_alignParentRight="true"
-                                app:indicatorColor="@color/secondary_500"
                                 android:indeterminate="true"
-                                app:indicatorSize="20dp"/>
+                                app:indicatorColor="@color/secondary_500"
+                                app:indicatorSize="20dp" />
 
                         </RelativeLayout>
 

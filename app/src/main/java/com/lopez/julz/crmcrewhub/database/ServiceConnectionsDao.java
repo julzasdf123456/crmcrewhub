@@ -22,7 +22,7 @@ public interface ServiceConnectionsDao {
     @Query("SELECT * FROM ServiceConnections WHERE id = :id")
     ServiceConnections getOne(String id);
 
-    @Query("SELECT * FROM ServiceConnections WHERE Status = 'Approved' OR Status = 'Not Energized' OR Status = 'Energized'")
+    @Query("SELECT * FROM ServiceConnections WHERE (Status = 'Approved' OR Status = 'Not Energized' OR Status = 'Energized') AND (UploadStatus IS NULL OR UploadStatus = 'UPLOADABLE')")
     List<ServiceConnections> getQueue();
 
     @Query("DELETE FROM ServiceConnections")
@@ -33,4 +33,7 @@ public interface ServiceConnectionsDao {
 
     @Query("SELECT * FROM ServiceConnections WHERE Status='Energized' AND (DateTimeOfEnergization IS NOT NULL OR DateTimeOfEnergization != '') AND (DateTimeLinemenArrived IS NOT NULL OR DateTimeLinemenArrived != '')")
     List<ServiceConnections> getEnergized();
+
+    @Query("SELECT * FROM ServiceConnections WHERE UploadStatus = 'UPLOADABLE'")
+    List<ServiceConnections> getUploadableServicConnections();
 }

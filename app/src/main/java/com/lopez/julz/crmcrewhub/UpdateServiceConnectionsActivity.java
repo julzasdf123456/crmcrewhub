@@ -378,6 +378,10 @@ public class UpdateServiceConnectionsActivity extends AppCompatActivity implemen
                 serviceConnections.setDateTimeOfEnergization(energizationDateTime.getText().toString());
                 if (ObjectHelpers.getSelectedTextFromRadioGroup(assessment, getWindow().getDecorView()) != null) {
                     serviceConnections.setStatus(ObjectHelpers.getSelectedTextFromRadioGroup(assessment, getWindow().getDecorView()));
+
+                    if (serviceConnections.getStatus() != null && serviceConnections.getStatus().equals("Energized")) {
+                        serviceConnections.setUploadStatus("UPLOADABLE");
+                    }
                 }
                 serviceConnections.setNotes(remarks.getText().toString());
 

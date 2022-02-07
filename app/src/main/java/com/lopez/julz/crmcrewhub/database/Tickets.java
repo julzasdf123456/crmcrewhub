@@ -87,10 +87,37 @@ public class Tickets {
     @ColumnInfo(name = "Office")
     private String Office;
 
+    @ColumnInfo(name = "CurrentMeterNo")
+    private String CurrentMeterNo;
+
+    @ColumnInfo(name = "CurrentMeterBrand")
+    private String CurrentMeterBrand;
+
+    @ColumnInfo(name = "CurrentMeterReading")
+    private String CurrentMeterReading;
+
+    @ColumnInfo(name = "KwhRating")
+    private String KwhRating;
+
+    @ColumnInfo(name = "PercentError")
+    private String PercentError;
+
+    @ColumnInfo(name = "NewMeterNo")
+    private String NewMeterNo;
+
+    @ColumnInfo(name = "NewMeterBrand")
+    private String NewMeterBrand;
+
+    @ColumnInfo(name = "NewMeterReading")
+    private String NewMeterReading;
+
+    @ColumnInfo(name = "UploadStatus")
+    private String UploadStatus;
+
     public Tickets() {
     }
 
-    public Tickets(@NonNull String id, String accountNumber, String consumerName, String town, String barangay, String sitio, String ticket, String reason, String contactNumber, String reportedBy, String ORNumber, String ORDate, String geoLocation, String neighbor1, String neighbor2, String notes, String status, String dateTimeDownloaded, String dateTimeLinemanArrived, String dateTimeLinemanExecuted, String userId, String crewAssigned, String created_at, String updated_at, String trash, String office) {
+    public Tickets(@NonNull String id, String accountNumber, String consumerName, String town, String barangay, String sitio, String ticket, String reason, String contactNumber, String reportedBy, String ORNumber, String ORDate, String geoLocation, String neighbor1, String neighbor2, String notes, String status, String dateTimeDownloaded, String dateTimeLinemanArrived, String dateTimeLinemanExecuted, String userId, String crewAssigned, String created_at, String updated_at, String trash, String office, String currentMeterNo, String currentMeterBrand, String currentMeterReading, String kwhRating, String percentError, String newMeterNo, String newMeterBrand, String newMeterReading, String uploadStatus) {
         this.id = id;
         AccountNumber = accountNumber;
         ConsumerName = consumerName;
@@ -117,6 +144,15 @@ public class Tickets {
         this.updated_at = updated_at;
         Trash = trash;
         Office = office;
+        CurrentMeterNo = currentMeterNo;
+        CurrentMeterBrand = currentMeterBrand;
+        CurrentMeterReading = currentMeterReading;
+        KwhRating = kwhRating;
+        PercentError = percentError;
+        NewMeterNo = newMeterNo;
+        NewMeterBrand = newMeterBrand;
+        NewMeterReading = newMeterReading;
+        UploadStatus = uploadStatus;
     }
 
     @NonNull
@@ -326,5 +362,77 @@ public class Tickets {
 
     public void setOffice(String office) {
         Office = office;
+    }
+
+    public String getCurrentMeterNo() {
+        return CurrentMeterNo;
+    }
+
+    public void setCurrentMeterNo(String currentMeterNo) {
+        CurrentMeterNo = currentMeterNo;
+    }
+
+    public String getCurrentMeterBrand() {
+        return CurrentMeterBrand;
+    }
+
+    public void setCurrentMeterBrand(String currentMeterBrand) {
+        CurrentMeterBrand = currentMeterBrand;
+    }
+
+    public String getCurrentMeterReading() {
+        return CurrentMeterReading;
+    }
+
+    public void setCurrentMeterReading(String currentMeterReading) {
+        CurrentMeterReading = currentMeterReading;
+    }
+
+    public String getKwhRating() {
+        return KwhRating;
+    }
+
+    public void setKwhRating(String kwhRating) {
+        KwhRating = kwhRating;
+    }
+
+    public String getPercentError() {
+        return PercentError;
+    }
+
+    public void setPercentError(String percentError) {
+        PercentError = percentError;
+    }
+
+    public String getNewMeterNo() {
+        return NewMeterNo;
+    }
+
+    public void setNewMeterNo(String newMeterNo) {
+        NewMeterNo = newMeterNo;
+    }
+
+    public String getNewMeterBrand() {
+        return NewMeterBrand;
+    }
+
+    public void setNewMeterBrand(String newMeterBrand) {
+        NewMeterBrand = newMeterBrand;
+    }
+
+    public String getNewMeterReading() {
+        return NewMeterReading;
+    }
+
+    public void setNewMeterReading(String newMeterReading) {
+        NewMeterReading = newMeterReading;
+    }
+
+    public String getUploadStatus() {
+        return UploadStatus;
+    }
+
+    public void setUploadStatus(String uploadStatus) {
+        UploadStatus = uploadStatus;
     }
 }

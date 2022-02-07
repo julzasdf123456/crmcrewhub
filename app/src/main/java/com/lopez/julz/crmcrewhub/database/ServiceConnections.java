@@ -98,9 +98,12 @@ public class ServiceConnections {
     @ColumnInfo(name = "LongSpan")
     private String LongSpan;
 
+    @ColumnInfo(name = "UploadStatus")
+    private String UploadStatus;
+
     public ServiceConnections() {}
 
-    public ServiceConnections(@NonNull String id, String memberConsumerId, String dateOfApplication, String serviceAccountName, String accountCount, String sitio, String barangay, String town, String contactNumber, String emailAddress, String accountType, String accountOrganization, String organizationAccountNumber, String isNIHE, String accountApplicationType, String connectionApplicationType, String buildingType, String status, String notes, String trash, String ORNumber, String ORDate, String dateTimeLinemenArrived, String dateTimeOfEnergization, String energizationOrderIssued, String dateTimeOfEnergizationIssue, String stationCrewAssigned, String loadCategory, String temporaryDurationInMonths, String longSpan) {
+    public ServiceConnections(@NonNull String id, String memberConsumerId, String dateOfApplication, String serviceAccountName, String accountCount, String sitio, String barangay, String town, String contactNumber, String emailAddress, String accountType, String accountOrganization, String organizationAccountNumber, String isNIHE, String accountApplicationType, String connectionApplicationType, String buildingType, String status, String notes, String trash, String ORNumber, String ORDate, String dateTimeLinemenArrived, String dateTimeOfEnergization, String energizationOrderIssued, String dateTimeOfEnergizationIssue, String stationCrewAssigned, String loadCategory, String temporaryDurationInMonths, String longSpan, String uploadStatus) {
         this.id = id;
         MemberConsumerId = memberConsumerId;
         DateOfApplication = dateOfApplication;
@@ -131,6 +134,7 @@ public class ServiceConnections {
         LoadCategory = loadCategory;
         TemporaryDurationInMonths = temporaryDurationInMonths;
         LongSpan = longSpan;
+        UploadStatus = uploadStatus;
     }
 
     @NonNull
@@ -372,5 +376,13 @@ public class ServiceConnections {
 
     public void setLongSpan(String longSpan) {
         LongSpan = longSpan;
+    }
+
+    public String getUploadStatus() {
+        return UploadStatus;
+    }
+
+    public void setUploadStatus(String uploadStatus) {
+        UploadStatus = uploadStatus;
     }
 }

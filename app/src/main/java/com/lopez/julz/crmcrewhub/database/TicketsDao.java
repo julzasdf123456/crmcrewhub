@@ -9,7 +9,7 @@ import java.util.List;
 
 @Dao
 public interface TicketsDao {
-    @Query("SELECT * FROM Tickets WHERE Trash IS NULL ORDER BY ConsumerName")
+    @Query("SELECT * FROM Tickets WHERE Trash IS NULL AND (UploadStatus IS NULL OR UploadStatus = 'UPLOADABLE') ORDER BY ConsumerName")
     List<Tickets> getAll();
 
     @Insert
@@ -20,4 +20,7 @@ public interface TicketsDao {
 
     @Query("SELECT * FROM Tickets WHERE id = :id")
     Tickets getOne(String id);
+
+    @Query("SELECT * FROM Tickets WHERE UploadStatus = 'UPLOADABLE'")
+    List<Tickets> getUploadableTickets();
 }

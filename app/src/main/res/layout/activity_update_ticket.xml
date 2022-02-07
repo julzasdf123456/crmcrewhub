@@ -43,20 +43,475 @@
 
             </androidx.appcompat.widget.Toolbar>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-            
-            <com.google.android.material.card.MaterialCardView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                app:contentPadding="15dp">
-                
-            </com.google.android.material.card.MaterialCardView>
-            
-        </LinearLayout>
+                android:orientation="vertical">
+
+                <TableLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TableRow
+                        android:layout_width="match_parent">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical"
+                            android:layout_column="1"
+                            android:layout_weight="1">
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                app:contentPadding="10dp"
+                                android:layout_margin="5dp">
+
+                                <ScrollView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent">
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:orientation="vertical">
+
+                                        <!-- ARRIVAL -->
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="Date and Time of Arrival"
+                                            android:drawableLeft="@drawable/ic_round_access_time_24"
+                                            android:drawablePadding="10dp"/>
+
+                                        <RelativeLayout
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content">
+
+                                            <com.google.android.material.button.MaterialButton
+                                                android:id="@+id/markTimeOfArrivalBtn"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:layout_alignParentLeft="true"
+                                                android:text="mark" />
+
+                                            <EditText
+                                                android:id="@+id/arrivalDateTime"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginLeft="5dp"
+                                                android:layout_marginTop="5dp"
+                                                android:layout_marginRight="5dp"
+                                                android:layout_marginBottom="15dp"
+                                                android:layout_toRightOf="@+id/markTimeOfArrivalBtn"
+                                                android:background="@drawable/options_custom_form"
+                                                android:enabled="false"
+                                                android:hint="Time"
+                                                android:inputType="text"
+                                                android:paddingLeft="15dp"
+                                                android:paddingTop="7dp"
+                                                android:paddingRight="10dp"
+                                                android:paddingBottom="7dp" />
+
+                                        </RelativeLayout>
+
+                                        <View
+                                            android:layout_width="match_parent"
+                                            android:layout_height="1px"
+                                            android:background="@color/grey_light"
+                                            android:layout_marginTop="10dp"
+                                            android:layout_marginBottom="15dp"/>
+
+                                        <!-- ENERGIZED -->
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="Date and Time of Execution/Action"
+                                            android:drawableLeft="@drawable/ic_baseline_access_time_filled_24"
+                                            android:drawablePadding="10dp"/>
+
+                                        <RelativeLayout
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content">
+
+                                            <com.google.android.material.button.MaterialButton
+                                                android:id="@+id/markTimeOfEnergizationBtn"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:layout_alignParentLeft="true"
+                                                android:text="mark" />
+
+                                            <EditText
+                                                android:id="@+id/energizationDateTime"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginLeft="5dp"
+                                                android:layout_marginTop="5dp"
+                                                android:layout_marginRight="5dp"
+                                                android:layout_marginBottom="15dp"
+                                                android:layout_toRightOf="@+id/markTimeOfEnergizationBtn"
+                                                android:background="@drawable/options_custom_form"
+                                                android:enabled="false"
+                                                android:hint="Time"
+                                                android:inputType="text"
+                                                android:paddingLeft="15dp"
+                                                android:paddingTop="7dp"
+                                                android:paddingRight="10dp"
+                                                android:paddingBottom="7dp" />
+
+                                        </RelativeLayout>
+
+                                        <View
+                                            android:layout_width="match_parent"
+                                            android:layout_height="1px"
+                                            android:background="@color/grey_light"
+                                            android:layout_marginTop="10dp"
+                                            android:layout_marginBottom="15dp"/>
+
+                                        <!-- ASSESSMENT -->
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="Assessment"
+                                            android:drawableLeft="@drawable/ic_round_library_add_check_24"
+                                            android:drawablePadding="10dp"/>
+
+                                        <RadioGroup
+                                            android:id="@+id/assessment"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:orientation="horizontal">
+
+                                            <RadioButton
+                                                android:id="@+id/opsExecuted"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:text="Executed"
+                                                android:layout_marginRight="15dp"
+                                                android:layout_marginLeft="15dp"/>
+
+                                            <RadioButton
+                                                android:id="@+id/opsNotExecuted"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:text="Not Executed"
+                                                android:layout_marginRight="15dp"
+                                                android:layout_marginLeft="15dp"
+                                                android:paddingBottom="5dp"/>
+
+                                        </RadioGroup>
+
+                                        <EditText
+                                            android:id="@+id/remarks"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:hint="Remarks and Notes"
+                                            android:inputType="text|textMultiLine"
+                                            android:layout_marginBottom="15dp"
+                                            android:background="@drawable/options_custom_form"
+                                            android:paddingTop="7dp"
+                                            android:paddingBottom="7dp"
+                                            android:paddingLeft="15dp"
+                                            android:paddingRight="10dp"
+                                            android:layout_toRightOf="@+id/markTimeOfEnergizationBtn"
+                                            android:layout_marginTop="5dp"
+                                            android:layout_marginLeft="5dp"
+                                            android:layout_marginRight="5dp"
+                                            android:lines="3"
+                                            android:gravity="left|top"/>
+
+                                    </LinearLayout>
+
+                                </ScrollView>
+
+                            </com.google.android.material.card.MaterialCardView>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical"
+                            android:layout_column="2"
+                            android:layout_weight="2">
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                app:contentPadding="10dp"
+                                android:layout_margin="5dp">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Ticket Details"
+                                        android:drawableLeft="@drawable/ic_baseline_assignment_24"
+                                        android:drawablePadding="10dp"/>
+
+                                    <View
+                                        android:layout_width="match_parent"
+                                        android:layout_height="1px"
+                                        android:layout_marginTop="5dp"
+                                        android:layout_marginBottom="5dp"
+                                        android:background="@color/grey_light"/>
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Ticket Type"/>
+
+                                    <TextView
+                                        android:id="@+id/ticketType"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="@color/black"
+                                        android:background="@drawable/options_custom_form"
+                                        android:padding="8dp"
+                                        android:layout_marginBottom="10dp"/>
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Reason"/>
+
+                                    <TextView
+                                        android:id="@+id/reason"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="@color/black"
+                                        android:background="@drawable/options_custom_form"
+                                        android:padding="8dp"
+                                        android:layout_marginBottom="10dp"/>
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Account Number"/>
+
+                                    <TextView
+                                        android:id="@+id/acctNo"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="@color/black"
+                                        android:background="@drawable/options_custom_form"
+                                        android:padding="8dp"
+                                        android:layout_marginBottom="10dp"/>
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Address"/>
+
+                                    <TextView
+                                        android:id="@+id/address"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="@color/black"
+                                        android:background="@drawable/options_custom_form"
+                                        android:padding="8dp"
+                                        android:layout_marginBottom="10dp"/>
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Contact Number"/>
+
+                                    <TextView
+                                        android:id="@+id/contact"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="@color/black"
+                                        android:background="@drawable/options_custom_form"
+                                        android:padding="8dp"
+                                        android:layout_marginBottom="10dp"/>
+
+                                </LinearLayout>
+                            </com.google.android.material.card.MaterialCardView>
+
+                        </LinearLayout>
+
+                    </TableRow>
+                </TableLayout>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:contentPadding="10dp"
+                    android:layout_margin="5dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Meter Details"
+                            android:drawableLeft="@drawable/ic_baseline_av_timer_24"
+                            android:drawablePadding="10dp"/>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1px"
+                            android:layout_marginTop="5dp"
+                            android:layout_marginBottom="5dp"
+                            android:background="@color/grey_light"/>
+
+                        <TableLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+
+                            <TableRow
+                                android:layout_width="match_parent">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:orientation="vertical"
+                                    android:layout_column="1"
+                                    android:layout_weight="1">
+
+                                    <com.google.android.material.card.MaterialCardView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        app:contentPadding="10dp"
+                                        android:layout_margin="5dp">
+
+                                        <LinearLayout
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:orientation="vertical">
+
+                                            <TextView
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:text="Old Meter Number"/>
+
+                                            <TextView
+                                                android:id="@+id/oldMeterSerial"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:textColor="@color/black"
+                                                android:background="@drawable/options_custom_form"
+                                                android:padding="11dp"
+                                                android:layout_marginBottom="10dp"/>
+
+                                            <TextView
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:text="Old Meter Brand"/>
+
+                                            <TextView
+                                                android:id="@+id/oldMeterBrand"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:textColor="@color/black"
+                                                android:background="@drawable/options_custom_form"
+                                                android:padding="11dp"
+                                                android:layout_marginBottom="10dp"/>
+
+                                            <TextView
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:text="Old Meter Last Reading"/>
+
+                                            <EditText
+                                                android:id="@+id/oldMeterReading"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:background="@drawable/options_custom_form"
+                                                android:padding="8dp"
+                                                android:inputType="numberDecimal"
+                                                android:hint="Input Reading Here"/>
+
+                                        </LinearLayout>
+
+                                    </com.google.android.material.card.MaterialCardView>
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:orientation="vertical"
+                                    android:layout_column="2"
+                                    android:layout_weight="2">
+
+                                    <com.google.android.material.card.MaterialCardView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        app:contentPadding="10dp"
+                                        android:layout_margin="5dp">
+
+                                        <LinearLayout
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:orientation="vertical">
+
+                                            <TextView
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:text="New Meter Number"/>
+
+                                            <EditText
+                                                android:id="@+id/newMeterNumber"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:background="@drawable/options_custom_form"
+                                                android:padding="8dp"
+                                                android:inputType="text"
+                                                android:hint="Input Meter Number Here"
+                                                android:layout_marginBottom="10dp"/>
+
+                                            <TextView
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:text="New Meter Brand"/>
+
+                                            <EditText
+                                                android:id="@+id/newMeterBrand"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:background="@drawable/options_custom_form"
+                                                android:padding="8dp"
+                                                android:inputType="text"
+                                                android:hint="Input Brand Here"
+                                                android:layout_marginBottom="10dp"/>
+
+                                            <TextView
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:text="New Meter Last Reading"/>
+
+                                            <EditText
+                                                android:id="@+id/newMeterReading"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:background="@drawable/options_custom_form"
+                                                android:padding="8dp"
+                                                android:inputType="numberDecimal"
+                                                android:hint="Input Reading Here"
+                                                android:layout_marginBottom="10dp"/>
+
+                                        </LinearLayout>
+
+                                    </com.google.android.material.card.MaterialCardView>
+
+                                </LinearLayout>
+
+                            </TableRow>
+                        </TableLayout>
+
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
 
         </LinearLayout>
     </ScrollView>

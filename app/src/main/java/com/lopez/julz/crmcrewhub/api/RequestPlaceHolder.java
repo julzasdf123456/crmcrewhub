@@ -49,6 +49,9 @@ public interface RequestPlaceHolder {
     @POST("create-timeframes")
     Call<TimeFrames> uploadTimeFrames(@Body TimeFrames timeFrames);
 
+    @GET("update-downloaded-service-connection-status")
+    Call<Void> updateDownloadedServiceConnectionStatus(@Query("CrewAssigned")String crewAssigned, @Query("User") String User, @Query("Status") String Status);
+
     /**
      * Tickets
      */
@@ -58,6 +61,9 @@ public interface RequestPlaceHolder {
     @GET("get-downloadable-tickets")
     Call<List<Tickets>> getDownloadbleTickets(@Query("CrewAssigned") String CrewAssigned);
 
-    @GET("update-downloaded-status")
+    @GET("update-downloaded-tickets-status")
     Call<Void> updateDownloadedStatus(@Query("CrewAssigned") String CrewAssigned, @Query("UserId") String UserId);
+
+    @POST("upload-tickets")
+    Call<Tickets> uploadTickets(@Body Tickets tickets);
 }
