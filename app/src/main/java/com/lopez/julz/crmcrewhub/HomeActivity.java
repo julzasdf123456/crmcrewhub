@@ -21,13 +21,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.google.gson.JsonParser;
 import com.lopez.julz.crmcrewhub.api.RequestPlaceHolder;
 import com.lopez.julz.crmcrewhub.api.RetrofitBuilder;
 import com.lopez.julz.crmcrewhub.classes.Barangays;
 import com.lopez.julz.crmcrewhub.classes.ConsumerInfo;
+import com.lopez.julz.crmcrewhub.classes.DownloadAdapter;
+import com.lopez.julz.crmcrewhub.classes.DownloadTicketsAdapter;
 import com.lopez.julz.crmcrewhub.classes.HomeServiceConnectionsQueueAdapter;
 import com.lopez.julz.crmcrewhub.classes.ObjectHelpers;
 import com.lopez.julz.crmcrewhub.classes.TicketsHomeAdapter;
@@ -38,6 +42,7 @@ import com.lopez.julz.crmcrewhub.database.ServiceConnectionInspections;
 import com.lopez.julz.crmcrewhub.database.ServiceConnectionInspectionsDao;
 import com.lopez.julz.crmcrewhub.database.ServiceConnections;
 import com.lopez.julz.crmcrewhub.database.ServiceConnectionsDao;
+import com.lopez.julz.crmcrewhub.database.Settings;
 import com.lopez.julz.crmcrewhub.database.TicketRepositories;
 import com.lopez.julz.crmcrewhub.database.TicketRepositoriesDao;
 import com.lopez.julz.crmcrewhub.database.Tickets;
@@ -80,12 +85,13 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
     public Style style;
 
     // MENU BUTTONS
-    private ImageButton refreshAll, logout, settings, download, upload, archive;
+    private ImageButton refreshAll, logout, settingsBtn, download, upload, archive;
 
     public RetrofitBuilder retrofitBuilder;
     private RequestPlaceHolder requestPlaceHolder;
 
     public AppDatabase db;
+    public Settings settings;
 
     /**
      * SERVICE CONNECTIONS
@@ -124,9 +130,6 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
         userId = getIntent().getExtras().getString("USERID");
         crew = getIntent().getExtras().getString("CREW");
 
-        retrofitBuilder = new RetrofitBuilder();
-        requestPlaceHolder = retrofitBuilder.getRetrofit().create(RequestPlaceHolder.class);
-
         db = Room.databaseBuilder(this,
                 AppDatabase.class, ObjectHelpers.databaseName()).fallbackToDestructiveMigration().build();
 
@@ -137,7 +140,7 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
 
         // menu
         logout = (ImageButton) findViewById(R.id.logout);
-        settings = (ImageButton) findViewById(R.id.settings);
+        settingsBtn = (ImageButton) findViewById(R.id.settings);
         download = (ImageButton) findViewById(R.id.download);
         upload = (ImageButton) findViewById(R.id.upload);
         archive = (ImageButton) findViewById(R.id.archive);
@@ -167,10 +170,7 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
 
         selectTab(scQueueTitle, ticketsQueueTitle, recyclerviewScHome, recyclerviewTicketsHome);
 
-        // DOWNLOAD ASSETS
-        downloadTownsBackground();
-        downloadBarangaysBackground();
-        downloadTicketRepos();
+        new FetchSettings().execute();
 
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -190,7 +190,7 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
             }
         });
 
-        settings.setOnClickListener(new View.OnClickListener() {
+        settingsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(HomeActivity.this, SettingsActivity.class));
@@ -966,4 +966,32 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
         }
     }
 
+    public class FetchSettings extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            try {
+                settings = db.settingsDao().getSettings();
+            } catch (Exception e) {
+                Log.e("ERR_FETCH_SETTINGS", e.getMessage());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void unused) {
+            super.onPostExecute(unused);
+            if (settings != null) {
+                retrofitBuilder = new RetrofitBuilder(settings.getDefaultServer());
+                requestPlaceHolder = retrofitBuilder.getRetrofit().create(RequestPlaceHolder.class);
+
+                // DOWNLOAD ASSETS
+                downloadTownsBackground();
+                downloadBarangaysBackground();
+                downloadTicketRepos();
+            } else {
+                startActivity(new Intent(HomeActivity.this, ConnectionSettingsActivity.class));
+            }
+        }
+    }
 }

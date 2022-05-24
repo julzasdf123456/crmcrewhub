@@ -6,15 +6,22 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.content.Context;
+import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
+import com.google.android.material.snackbar.Snackbar;
 import com.lopez.julz.crmcrewhub.api.RequestPlaceHolder;
 import com.lopez.julz.crmcrewhub.api.RetrofitBuilder;
 import com.lopez.julz.crmcrewhub.classes.AlertHelpers;
@@ -26,6 +33,7 @@ import com.lopez.julz.crmcrewhub.database.ServiceConnectionInspections;
 import com.lopez.julz.crmcrewhub.database.ServiceConnectionInspectionsDao;
 import com.lopez.julz.crmcrewhub.database.ServiceConnections;
 import com.lopez.julz.crmcrewhub.database.ServiceConnectionsDao;
+import com.lopez.julz.crmcrewhub.database.Settings;
 import com.lopez.julz.crmcrewhub.database.Tickets;
 import com.lopez.julz.crmcrewhub.database.TicketsDao;
 
@@ -64,6 +72,7 @@ public class DownloadActivity extends AppCompatActivity {
     public TextView scCount;
 
     public AppDatabase db;
+    public Settings settings;
 
     public String userId, crew;
 
@@ -75,59 +84,14 @@ public class DownloadActivity extends AppCompatActivity {
         db = Room.databaseBuilder(this,
                 AppDatabase.class, ObjectHelpers.databaseName()).fallbackToDestructiveMigration().build();
 
-        retrofitBuilder = new RetrofitBuilder();
-        requestPlaceHolder = retrofitBuilder.getRetrofit().create(RequestPlaceHolder.class);
-
         userId = getIntent().getExtras().getString("USERID");
         crew = getIntent().getExtras().getString("CREW");
+    }
 
-        /**
-         * SERVICE CONNECTIONS
-         */
-        downloadProgress = (CircularProgressIndicator) findViewById(R.id.downloadProgress);
-        downloadRecyclerView = (RecyclerView) findViewById(R.id.downloadRecyclerViewServiceConnections);
-        refresh = (SwipeRefreshLayout) findViewById(R.id.refresh);
-        scCount = (TextView) findViewById(R.id.scCount);
-        downloadDataBtn = findViewById(R.id.downloadDataBtn);
-
-        serviceConnectionsList = new ArrayList<>();
-        serviceConnectionInspectionsList = new ArrayList<>();
-        downloadAdapter = new DownloadAdapter(serviceConnectionsList, this);
-        downloadRecyclerView.setAdapter(downloadAdapter);
-        downloadRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-        /**
-         * TICKETS
-         */
-        downloadRecyclerViewTickets = findViewById(R.id.downloadRecyclerViewTickets);
-        ticketsList = new ArrayList<>();
-        downloadTicketsAdapter = new DownloadTicketsAdapter(ticketsList, this);
-        downloadRecyclerViewTickets.setAdapter(downloadTicketsAdapter);
-        downloadRecyclerViewTickets.setLayoutManager(new LinearLayoutManager(this));
-
-        fetchDownloadableServiceConnections();
-        fetchDownloadableTickets();
-
-        refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                fetchDownloadableServiceConnections();
-                fetchDownloadableTickets();
-            }
-        });
-
-        downloadDataBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (serviceConnectionsList == null) {
-                    Toast.makeText(DownloadActivity.this, "No downloadable service connection data for the moment.", Toast.LENGTH_LONG).show();
-                } else {
-                    new DownloadServiceConnections().execute(serviceConnectionsList);
-                    new DownloadInspections().execute(serviceConnectionInspectionsList);
-                    new DownloadTickets().execute();
-                }
-            }
-        });
+    @Override
+    protected void onResume() {
+        super.onResume();
+        new FetchSettings().execute();
     }
 
     /**
@@ -437,6 +401,78 @@ public class DownloadActivity extends AppCompatActivity {
             });
         } catch (Exception e) {
             Log.e("ERR_SET_UPLD_STS", e.getMessage());
+        }
+    }
+
+    public class FetchSettings extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            try {
+                settings = db.settingsDao().getSettings();
+            } catch (Exception e) {
+                Log.e("ERR_FETCH_SETTINGS", e.getMessage());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void unused) {
+            super.onPostExecute(unused);
+            if (settings != null) {
+                retrofitBuilder = new RetrofitBuilder(settings.getDefaultServer());
+                requestPlaceHolder = retrofitBuilder.getRetrofit().create(RequestPlaceHolder.class);
+
+                /**
+                 * SERVICE CONNECTIONS
+                 */
+                downloadProgress = (CircularProgressIndicator) findViewById(R.id.downloadProgress);
+                downloadRecyclerView = (RecyclerView) findViewById(R.id.downloadRecyclerViewServiceConnections);
+                refresh = (SwipeRefreshLayout) findViewById(R.id.refresh);
+                scCount = (TextView) findViewById(R.id.scCount);
+                downloadDataBtn = findViewById(R.id.downloadDataBtn);
+
+                serviceConnectionsList = new ArrayList<>();
+                serviceConnectionInspectionsList = new ArrayList<>();
+                downloadAdapter = new DownloadAdapter(serviceConnectionsList, DownloadActivity.this);
+                downloadRecyclerView.setAdapter(downloadAdapter);
+                downloadRecyclerView.setLayoutManager(new LinearLayoutManager(DownloadActivity.this));
+
+                /**
+                 * TICKETS
+                 */
+                downloadRecyclerViewTickets = findViewById(R.id.downloadRecyclerViewTickets);
+                ticketsList = new ArrayList<>();
+                downloadTicketsAdapter = new DownloadTicketsAdapter(ticketsList, DownloadActivity.this);
+                downloadRecyclerViewTickets.setAdapter(downloadTicketsAdapter);
+                downloadRecyclerViewTickets.setLayoutManager(new LinearLayoutManager(DownloadActivity.this));
+
+                fetchDownloadableServiceConnections();
+                fetchDownloadableTickets();
+
+                refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        fetchDownloadableServiceConnections();
+                        fetchDownloadableTickets();
+                    }
+                });
+
+                downloadDataBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (serviceConnectionsList == null) {
+                            Toast.makeText(DownloadActivity.this, "No downloadable service connection data for the moment.", Toast.LENGTH_LONG).show();
+                        } else {
+                            new DownloadServiceConnections().execute(serviceConnectionsList);
+                            new DownloadInspections().execute(serviceConnectionInspectionsList);
+                            new DownloadTickets().execute();
+                        }
+                    }
+                });
+            } else {
+                startActivity(new Intent(DownloadActivity.this, ConnectionSettingsActivity.class));
+            }
         }
     }
 }

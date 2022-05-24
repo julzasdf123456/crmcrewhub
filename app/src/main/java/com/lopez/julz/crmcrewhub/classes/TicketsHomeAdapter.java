@@ -147,7 +147,7 @@ public class TicketsHomeAdapter extends RecyclerView.Adapter<TicketsHomeAdapter.
 
                     ticketName = ticketRepositoriesDao.getOne(ticketSource.getParentTicket()) != null ? (ticketRepositoriesDao.getOne(ticketSource.getParentTicket()).getName() + "-" + ticketSource.getName()) : ticketSource.getName();
                     consumername = ticket.getConsumerName();
-                    consumeraddress = ticket.getSitio() + ", " + barangaysDao.getOne(ticket.getBarangay()).getBarangay() + ", " + townsDao.getOne(ticket.getTown()).getTown();
+                    consumeraddress = ticket.getBarangay() != null ? (ticket.getSitio() + ", " + barangaysDao.getOne(ticket.getBarangay()).getBarangay() + ", " + townsDao.getOne(ticket.getTown()).getTown()) : ticket.getSitio();
                     accountno = ticket.getAccountNumber();
                 }
             } catch (Exception e) {

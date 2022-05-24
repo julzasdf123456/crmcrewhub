@@ -14,6 +14,13 @@ public class RetrofitBuilder {
                 .build();
     }
 
+    public RetrofitBuilder(String ip) {
+        retrofit = new Retrofit.Builder()
+                .baseUrl(BaseURL.baseUrl(ip))
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+    }
+
     public Retrofit getRetrofit() {
         return retrofit;
     }

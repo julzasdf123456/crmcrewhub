@@ -5,5 +5,20 @@
         <domain includeSubdomains="true">192.168.2.12</domain>
         <domain includeSubdomains="true">192.168.103.79</domain>
         <domain includeSubdomains="true">192.168.110.94</domain>
+        <domain includeSubdomains="true">192.168.5.97</domain>
+
+        <!-- DEPLOYMENT -->
+        <domain includeSubdomains="true">192.168.100.10</domain>
+        <domain includeSubdomains="true">192.168.100.20</domain>
+        <domain includeSubdomains="true">192.168.100.30</domain>
+        <domain includeSubdomains="true">192.168.100.40</domain>
+        <domain includeSubdomains="true">192.168.100.50</domain>
+        <domain includeSubdomains="true">192.168.100.60</domain>
+        <domain includeSubdomains="true">192.168.100.70</domain>
+        <domain includeSubdomains="true">192.168.100.80</domain>
+        <domain includeSubdomains="true">192.168.100.90</domain>
+        <domain includeSubdomains="true">192.168.100.4</domain>
+        <domain includeSubdomains="true">192.168.100.1</domain>
+        <domain includeSubdomains="true">203.177.135.179</domain>
     </domain-config>
 </network-security-config>

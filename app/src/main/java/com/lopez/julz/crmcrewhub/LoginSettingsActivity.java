@@ -19,6 +19,7 @@ import com.lopez.julz.crmcrewhub.database.AppConfigDao;
 import com.lopez.julz.crmcrewhub.database.AppDatabase;
 import com.lopez.julz.crmcrewhub.database.Crew;
 import com.lopez.julz.crmcrewhub.database.CrewDao;
+import com.lopez.julz.crmcrewhub.database.Settings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,6 +63,13 @@ public class LoginSettingsActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    public void onBackPressed() {
+        new SaveAppConfig().execute(crewList.get(selectCrew.getSelectedItemPosition()).getId());
+        super.onBackPressed();
+    }
+
 
     public class FetchCrews extends AsyncTask<Void, Void, Void> {
 
@@ -114,4 +122,5 @@ public class LoginSettingsActivity extends AppCompatActivity {
             finish();
         }
     }
+
 }

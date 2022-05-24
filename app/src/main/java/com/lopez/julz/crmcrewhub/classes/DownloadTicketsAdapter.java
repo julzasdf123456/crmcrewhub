@@ -91,7 +91,7 @@ public class DownloadTicketsAdapter extends RecyclerView.Adapter<DownloadTickets
 
                 if (tickets != null) {
                     ticket = ticketRepositoriesDao.getOne(tickets.getTicket()).getName();
-                    consumeraddress = barangaysDao.getOne(tickets.getBarangay()).getBarangay() + ", " + townsDao.getOne(tickets.getTown()).getTown();
+                    consumeraddress = tickets.getBarangay() != null ? (barangaysDao.getOne(tickets.getBarangay()).getBarangay() + ", " + townsDao.getOne(tickets.getTown()).getTown()) : tickets.getSitio();
                     consumername = tickets.getConsumerName();
                     accountno = tickets.getAccountNumber();
                 }

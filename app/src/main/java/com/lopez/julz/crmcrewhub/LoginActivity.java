@@ -1,12 +1,17 @@
 package com.lopez.julz.crmcrewhub;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.room.Room;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -31,6 +36,7 @@ import com.lopez.julz.crmcrewhub.database.AppConfigDao;
 import com.lopez.julz.crmcrewhub.database.AppDatabase;
 import com.lopez.julz.crmcrewhub.database.Crew;
 import com.lopez.julz.crmcrewhub.database.CrewDao;
+import com.lopez.julz.crmcrewhub.database.Settings;
 import com.lopez.julz.crmcrewhub.database.Users;
 import com.lopez.julz.crmcrewhub.database.UsersDao;
 
@@ -48,112 +54,152 @@ public class LoginActivity extends AppCompatActivity {
     public RetrofitBuilder retrofitBuilder;
     private RequestPlaceHolder requestPlaceHolder;
 
-    private MaterialButton settingsBtn;
+    private MaterialButton settingsBtn, connectionSettingsBtn;
 
     public AppDatabase db;
 
     public TextView configErrorMessage;
 
+    public Settings settings;
+
     private String CREW = null;
+
+    private static final int WIFI_PERMISSION = 100;
+    private static final int STORAGE_PERMISSION_READ = 101;
+    private static final int STORAGE_PERMISSION_WRITE = 102;
+    private static final int CAMERA = 103;
+    private static final int LOCATION = 104;
+    private static final int PHONE = 105;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        retrofitBuilder = new RetrofitBuilder();
-        requestPlaceHolder = retrofitBuilder.getRetrofit().create(RequestPlaceHolder.class);
-
         db = Room.databaseBuilder(this,
                 AppDatabase.class, ObjectHelpers.databaseName()).fallbackToDestructiveMigration().build();
 
-        configErrorMessage = findViewById(R.id.configErrorMessage);
-        username = (EditText) findViewById(R.id.username);
-        password = (EditText) findViewById(R.id.password);
-        loginBtn = (Button) findViewById(R.id.login);
+        checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, STORAGE_PERMISSION_WRITE);
+        checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE, STORAGE_PERMISSION_READ);
+        checkPermission(Manifest.permission.READ_PHONE_STATE, PHONE);
+        checkPermission(Manifest.permission.CAMERA, CAMERA);
+        checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, LOCATION);
+        checkPermission(Manifest.permission.ACCESS_WIFI_STATE, WIFI_PERMISSION);
+
         settingsBtn = findViewById(R.id.settingsBtn);
-        loginBtn.setEnabled(false);
-        configErrorMessage.setVisibility(View.GONE);
-
-        getAllCrew();
-
-        loginBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-                NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-
-                if (mWifi.isConnected()) {
-                    // PERFORM ONLINE LOGIN
-                    if (username.getText().equals("") | null == username.getText() | password.getText().equals("") | null == password.getText()) {
-                        Snackbar.make(username, "Please fill in the fields to login", Snackbar.LENGTH_LONG).show();
-                    } else {
-                        login();
-                    }
-                } else {
-                    // PERFORM OFFLINE LOGIN
-                    if (username.getText().equals("") | null == username.getText() | password.getText().equals("") | null == password.getText()) {
-                        Snackbar.make(username, "Please fill in the fields to login", Snackbar.LENGTH_LONG).show();
-                    } else {
-                        new LoginOffline().execute(username.getText().toString(), password.getText().toString());
-                    }
-                }
-            }
-        });
+        connectionSettingsBtn = findViewById(R.id.connectionSettingsBtn);
 
         settingsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
-
-                    builder.setTitle("Enter Admin Password");
-
-                    EditText editText = new EditText(LoginActivity.this);
-                    editText.setInputType(InputType.TYPE_NUMBER_VARIATION_PASSWORD);
-
-                    builder.setView(editText);
-
-                    builder.setCancelable(false);
-
-                    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.cancel();
-                        }
-                    });
-
-                    builder.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            if (editText.getText().toString().equals(getResources().getString(R.string.admin_pw))) {
-                                startActivity(new Intent(LoginActivity.this, LoginSettingsActivity.class));
-                            } else {
-                                Toast.makeText(LoginActivity.this, "Admin password mismatch!", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    });
-
-                    AlertDialog alertDialog = builder.create();
-
-                    alertDialog.show();
-                } catch (Exception e) {
-                    Log.e("ERR_STRT_PWD_DLG", e.getMessage());
-                }
+//                try {
+//                    AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+//
+//                    builder.setTitle("Enter Admin Password");
+//
+//                    EditText editText = new EditText(LoginActivity.this);
+//                    editText.setInputType(InputType.TYPE_NUMBER_VARIATION_PASSWORD);
+//
+//                    builder.setView(editText);
+//
+//                    builder.setCancelable(false);
+//
+//                    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+//                        @Override
+//                        public void onClick(DialogInterface dialog, int which) {
+//                            dialog.cancel();
+//                        }
+//                    });
+//
+//                    builder.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
+//                        @Override
+//                        public void onClick(DialogInterface dialog, int which) {
+//                            if (editText.getText().toString().equals(getResources().getString(R.string.admin_pw))) {
+//                                startActivity(new Intent(LoginActivity.this, LoginSettingsActivity.class));
+//                            } else {
+//                                Toast.makeText(LoginActivity.this, "Admin password mismatch!", Toast.LENGTH_SHORT).show();
+//                            }
+//                        }
+//                    });
+//
+//                    AlertDialog alertDialog = builder.create();
+//
+//                    alertDialog.show();
+//                } catch (Exception e) {
+//                    Log.e("ERR_STRT_PWD_DLG", e.getMessage());
+//                }
+                startActivity(new Intent(LoginActivity.this, LoginSettingsActivity.class));
             }
         });
+
+        connectionSettingsBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(LoginActivity.this, ConnectionSettingsActivity.class));
+            }
+        });
+    }
+
+    public void checkPermission(String permission, int requestCode) {
+        if (ContextCompat.checkSelfPermission(LoginActivity.this, permission) == PackageManager.PERMISSION_DENIED) {             // Requesting the permission
+            ActivityCompat.requestPermissions(LoginActivity.this, new String[] { permission }, requestCode);
+        } else {
+
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == WIFI_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(LoginActivity.this, "Wi-Fi Permission Granted", Toast.LENGTH_SHORT) .show();
+            } else {
+                Toast.makeText(LoginActivity.this, "Wi-Fi Permission Denied", Toast.LENGTH_SHORT) .show();
+            }
+        } else if (requestCode == STORAGE_PERMISSION_READ) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(LoginActivity.this, "Storage Permission Granted", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(LoginActivity.this, "Storage Permission Denied", Toast.LENGTH_SHORT).show();
+            }
+        } else if (requestCode == STORAGE_PERMISSION_WRITE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(LoginActivity.this, "Storage Permission Granted", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(LoginActivity.this, "Storage Permission Denied", Toast.LENGTH_SHORT).show();
+            }
+        } else if (requestCode == CAMERA) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(LoginActivity.this, "Camera Permission Granted", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(LoginActivity.this, "Camera Permission Denied", Toast.LENGTH_SHORT).show();
+            }
+        } else if (requestCode == LOCATION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(LoginActivity.this, "Location Permission Granted", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(LoginActivity.this, "Location Permission Denied", Toast.LENGTH_SHORT).show();
+            }
+        } else if (requestCode == PHONE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(LoginActivity.this, "Phone Permission Granted", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(LoginActivity.this, "Phone Permission Denied", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        new GetAppConfig().execute();
+        new FetchSettings().execute();
     }
 
-    @Override
-    public void onBackPressed() {
-        showAdminPasswordDialog();
-    }
+//    @Override
+//    public void onBackPressed() {
+//        showAdminPasswordDialog();
+//    }
 
     private void login() {
         Login login = new Login(username.getText().toString(), password.getText().toString());
@@ -378,6 +424,65 @@ public class LoginActivity extends AppCompatActivity {
             } else {
                 loginBtn.setEnabled(false);
                 configErrorMessage.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+    public class FetchSettings extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            try {
+                settings = db.settingsDao().getSettings();
+            } catch (Exception e) {
+                Log.e("ERR_FETCH_SETTINGS", e.getMessage());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void unused) {
+            super.onPostExecute(unused);
+            if (settings != null) {
+                retrofitBuilder = new RetrofitBuilder(settings.getDefaultServer());
+                requestPlaceHolder = retrofitBuilder.getRetrofit().create(RequestPlaceHolder.class);
+
+                configErrorMessage = findViewById(R.id.configErrorMessage);
+                username = (EditText) findViewById(R.id.username);
+                password = (EditText) findViewById(R.id.password);
+                loginBtn = (Button) findViewById(R.id.login);
+                loginBtn.setEnabled(false);
+                configErrorMessage.setVisibility(View.GONE);
+
+                getAllCrew();
+
+                new GetAppConfig().execute();
+
+                loginBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+                        NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+
+                        if (mWifi.isConnected()) {
+                            // PERFORM ONLINE LOGIN
+                            if (username.getText().equals("") | null == username.getText() | password.getText().equals("") | null == password.getText()) {
+                                Snackbar.make(username, "Please fill in the fields to login", Snackbar.LENGTH_LONG).show();
+                            } else {
+                                login();
+                            }
+                        } else {
+                            // PERFORM OFFLINE LOGIN
+                            if (username.getText().equals("") | null == username.getText() | password.getText().equals("") | null == password.getText()) {
+                                Snackbar.make(username, "Please fill in the fields to login", Snackbar.LENGTH_LONG).show();
+                            } else {
+                                new LoginOffline().execute(username.getText().toString(), password.getText().toString());
+                            }
+                        }
+                    }
+                });
+            } else {
+                startActivity(new Intent(LoginActivity.this, ConnectionSettingsActivity.class));
             }
         }
     }

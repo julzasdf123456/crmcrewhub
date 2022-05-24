@@ -352,7 +352,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Meter Details"
+                            android:text="Change Meter Area"
                             android:drawableLeft="@drawable/ic_baseline_av_timer_24"
                             android:drawablePadding="10dp"/>
 
@@ -362,6 +362,14 @@
                             android:layout_marginTop="5dp"
                             android:layout_marginBottom="5dp"
                             android:background="@color/grey_light"/>
+
+                        <RadioButton
+                            android:id="@+id/forAveraging"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="For Averaging"
+                            android:layout_marginRight="15dp"
+                            android:layout_marginLeft="15dp"/>
 
                         <TableLayout
                             android:layout_width="match_parent"
@@ -506,7 +514,6 @@
 
                             </TableRow>
                         </TableLayout>
-
 
                     </LinearLayout>
 

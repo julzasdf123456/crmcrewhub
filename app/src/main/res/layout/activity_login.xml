@@ -78,6 +78,17 @@
         android:gravity="center"
         android:layout_gravity="right"/>
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/connectionSettingsBtn"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        app:icon="@drawable/ic_baseline_private_connectivity_24"
+        app:iconTint="@color/grey_dark"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:gravity="center"
+        android:layout_gravity="right"
+        android:layout_marginRight="80dp"/>
+
     <TextView
         android:id="@+id/configErrorMessage"
         android:layout_width="240dp"

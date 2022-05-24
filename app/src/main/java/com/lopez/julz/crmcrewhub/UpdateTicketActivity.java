@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,6 +40,7 @@ public class UpdateTicketActivity extends AppCompatActivity {
     public MaterialButton markTimeOfArrivalBtn, markTimeOfEnergizationBtn;
     public EditText arrivalDateTime, energizationDateTime, remarks;
     public RadioGroup assessment;
+    public RadioButton forAveraging;
 
     public TextView oldMeterSerial, oldMeterBrand;
     public EditText oldMeterReading, newMeterSerial, newMeterBrand, newMeterReading;
@@ -77,6 +79,7 @@ public class UpdateTicketActivity extends AppCompatActivity {
         newMeterSerial = findViewById(R.id.newMeterNumber);
         newMeterBrand = findViewById(R.id.newMeterBrand);
         newMeterReading = findViewById(R.id.newMeterReading);
+        forAveraging = findViewById(R.id.forAveraging);
 
         new GetTicketDetails().execute();
 
@@ -106,6 +109,10 @@ public class UpdateTicketActivity extends AppCompatActivity {
                 ticket.setUploadStatus("UPLOADABLE");
             }
             ticket.setNotes(remarks.getText().toString());
+
+            if (forAveraging.isChecked()) {
+                ticket.setPercentError("FOR AVERAGING");
+            }
 
             ticket.setCurrentMeterReading(oldMeterReading.getText().toString());
             ticket.setNewMeterBrand(newMeterBrand.getText().toString());
@@ -184,6 +191,12 @@ public class UpdateTicketActivity extends AppCompatActivity {
                     } else if(ticket.getStatus().equals("Executed")) {
                         assessment.check(R.id.opsExecuted);
                     }
+                }
+
+                if (ticket.getPercentError() != null && ticket.getPercentError().equals("FOR AVERAGING")) {
+                    forAveraging.setChecked(true);
+                } else {
+                    forAveraging.setChecked(false);
                 }
             }
         }

@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,6 +24,7 @@ import com.lopez.julz.crmcrewhub.classes.UploadTicketsAdapter;
 import com.lopez.julz.crmcrewhub.database.AppDatabase;
 import com.lopez.julz.crmcrewhub.database.ServiceConnections;
 import com.lopez.julz.crmcrewhub.database.ServiceConnectionsDao;
+import com.lopez.julz.crmcrewhub.database.Settings;
 import com.lopez.julz.crmcrewhub.database.Tickets;
 import com.lopez.julz.crmcrewhub.database.TimeFrames;
 import com.lopez.julz.crmcrewhub.database.TimeFramesDao;
@@ -64,6 +66,7 @@ public class UploadActivity extends AppCompatActivity {
     public CircularProgressIndicator scProgressUpload, ticketsProgressUpload;
 
     public AlertDialog dialog;
+    public Settings settings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,23 +92,10 @@ public class UploadActivity extends AppCompatActivity {
 
         db = Room.databaseBuilder(this, AppDatabase.class, ObjectHelpers.databaseName()).fallbackToDestructiveMigration().build();
 
-        retrofitBuilder = new RetrofitBuilder();
-        requestPlaceHolder = retrofitBuilder.getRetrofit().create(RequestPlaceHolder.class);
-
         scCount = findViewById(R.id.scCount);
         uploadDataBtn = findViewById(R.id.uploadDataBtn);
 
-        new FetchUploadableServiceConnections().execute();
-        new FetchSCTimeFrames().execute();
-        new FetchUploadableTickets().execute();
-
-        uploadDataBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                scProgressUpload.setVisibility(View.VISIBLE);
-                uploadServiceConnectionData();
-            }
-        });
+        new FetchSettings().execute();
     }
 
     public void showLoadDialog() {
@@ -306,6 +296,10 @@ public class UploadActivity extends AppCompatActivity {
         protected Void doInBackground(Void... voids) {
             try {
                 ticketsList.addAll(db.ticketsDao().getUploadableTickets());
+
+                for (Tickets tc: ticketsList) {
+                    Log.e("TEST", tc.getPercentError());
+                }
             } catch (Exception e) {
                 Log.e("ERR_GET_TICKETS", e.getMessage());
             }
@@ -364,6 +358,43 @@ public class UploadActivity extends AppCompatActivity {
                 Log.e("ERR_UPDT_TICKT", e.getMessage());
             }
             return null;
+        }
+    }
+
+    public class FetchSettings extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            try {
+                settings = db.settingsDao().getSettings();
+            } catch (Exception e) {
+                Log.e("ERR_FETCH_SETTINGS", e.getMessage());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void unused) {
+            super.onPostExecute(unused);
+            if (settings != null) {
+                retrofitBuilder = new RetrofitBuilder(settings.getDefaultServer());
+                requestPlaceHolder = retrofitBuilder.getRetrofit().create(RequestPlaceHolder.class);
+
+                new FetchUploadableServiceConnections().execute();
+                new FetchSCTimeFrames().execute();
+                new FetchUploadableTickets().execute();
+
+                uploadDataBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        scProgressUpload.setVisibility(View.VISIBLE);
+                        uploadServiceConnectionData();
+                    }
+                });
+
+            } else {
+                startActivity(new Intent(UploadActivity.this, ConnectionSettingsActivity.class));
+            }
         }
     }
 }
