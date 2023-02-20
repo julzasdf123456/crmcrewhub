@@ -161,6 +161,30 @@ public class DownloadActivity extends AppCompatActivity {
         }
     }
 
+    public void notifyDownloaded(String name, String number, String id) {
+        try {
+            Call<Void> notifyDownloaded = requestPlaceHolder.notifyDownloaded(name, number, id);
+
+            notifyDownloaded.enqueue(new Callback<Void>() {
+                @Override
+                public void onResponse(Call<Void> call, Response<Void> response) {
+                    if (response.isSuccessful()) {
+                        Log.e("NOTIF_SUCCESS", "Notification sent");
+                    } else {
+                        Log.e("NOTIF_ERROR", response.message() + "\n" + response.raw() + "\n" + response.body());
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Void> call, Throwable t) {
+                    Log.e("NOTIF_ERROR", t.getMessage());
+                }
+            });
+        } catch (Exception e) {
+            Log.e("ERR_NOTIFS", e.getMessage());
+        }
+    }
+
     public class AssessDownloadableServiceConnections extends AsyncTask<List<ServiceConnections>, Void, Void> {
 
         @Override
@@ -228,6 +252,7 @@ public class DownloadActivity extends AppCompatActivity {
                 progress = i;
                 ServiceConnections serviceConnection = serviceConnections.get(i);
                 serviceConnectionsDao.insertAll(serviceConnection);
+                notifyDownloaded(serviceConnection.getServiceAccountName(), serviceConnection.getContactNumber(), serviceConnection.getId());
                 publishProgress(progress);
             }
 

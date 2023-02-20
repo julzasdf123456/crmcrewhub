@@ -15,4 +15,10 @@ public interface UsersDao {
 
     @Query("SELECT * FROM Users WHERE Username = :username AND Password = :password")
     Users getOne(String username, String password);
+
+    @Query("SELECT * FROM Users ORDER BY id DESC LIMIT 1")
+    Users getFirst();
+
+    @Query("SELECT * FROM Users WHERE id = :id")
+    Users getOneById(String id);
 }

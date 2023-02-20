@@ -9,4 +9,6 @@
     <color name="white">#FFFFFFFF</color>
     <color name="grey_light">#e0e0e0</color>
     <color name="grey_dark">#bdbdbd</color>
+    <color name="sc_primary_500">#009688</color>
+    <color name="sc_primary_700">#00796B</color>
 </resources>

@@ -101,9 +101,27 @@ public class ServiceConnections {
     @ColumnInfo(name = "UploadStatus")
     private String UploadStatus;
 
+    @ColumnInfo(name = "LinemanCrewExecuted")
+    private String LinemanCrewExecuted;
+
+    @ColumnInfo(name = "MeterSerialNumber")
+    private String MeterSerialNumber;
+
+    @ColumnInfo(name = "MeterBrand")
+    private String MeterBrand;
+
+    @ColumnInfo(name = "MeterSealNumber")
+    private String MeterSealNumber;
+
+    @ColumnInfo(name = "Verifier")
+    private String Verifier;
+
+    @ColumnInfo(name = "AccountTypeWord")
+    private String AccountTypeWord;
+
     public ServiceConnections() {}
 
-    public ServiceConnections(@NonNull String id, String memberConsumerId, String dateOfApplication, String serviceAccountName, String accountCount, String sitio, String barangay, String town, String contactNumber, String emailAddress, String accountType, String accountOrganization, String organizationAccountNumber, String isNIHE, String accountApplicationType, String connectionApplicationType, String buildingType, String status, String notes, String trash, String ORNumber, String ORDate, String dateTimeLinemenArrived, String dateTimeOfEnergization, String energizationOrderIssued, String dateTimeOfEnergizationIssue, String stationCrewAssigned, String loadCategory, String temporaryDurationInMonths, String longSpan, String uploadStatus) {
+    public ServiceConnections(@NonNull String id, String memberConsumerId, String dateOfApplication, String serviceAccountName, String accountCount, String sitio, String barangay, String town, String contactNumber, String emailAddress, String accountType, String accountOrganization, String organizationAccountNumber, String isNIHE, String accountApplicationType, String connectionApplicationType, String buildingType, String status, String notes, String trash, String ORNumber, String ORDate, String dateTimeLinemenArrived, String dateTimeOfEnergization, String energizationOrderIssued, String dateTimeOfEnergizationIssue, String stationCrewAssigned, String loadCategory, String temporaryDurationInMonths, String longSpan, String uploadStatus, String linemanCrewExecuted, String meterSerialNumber, String meterBrand, String meterSealNumber, String verifier, String accountTypeWord) {
         this.id = id;
         MemberConsumerId = memberConsumerId;
         DateOfApplication = dateOfApplication;
@@ -135,6 +153,12 @@ public class ServiceConnections {
         TemporaryDurationInMonths = temporaryDurationInMonths;
         LongSpan = longSpan;
         UploadStatus = uploadStatus;
+        LinemanCrewExecuted = linemanCrewExecuted;
+        MeterSerialNumber = meterSerialNumber;
+        MeterBrand = meterBrand;
+        MeterSealNumber = meterSealNumber;
+        Verifier = verifier;
+        AccountTypeWord = accountTypeWord;
     }
 
     @NonNull
@@ -384,5 +408,53 @@ public class ServiceConnections {
 
     public void setUploadStatus(String uploadStatus) {
         UploadStatus = uploadStatus;
+    }
+
+    public String getLinemanCrewExecuted() {
+        return LinemanCrewExecuted;
+    }
+
+    public void setLinemanCrewExecuted(String linemanCrewExecuted) {
+        LinemanCrewExecuted = linemanCrewExecuted;
+    }
+
+    public String getMeterSerialNumber() {
+        return MeterSerialNumber;
+    }
+
+    public void setMeterSerialNumber(String meterSerialNumber) {
+        MeterSerialNumber = meterSerialNumber;
+    }
+
+    public String getMeterBrand() {
+        return MeterBrand;
+    }
+
+    public void setMeterBrand(String meterBrand) {
+        MeterBrand = meterBrand;
+    }
+
+    public String getMeterSealNumber() {
+        return MeterSealNumber;
+    }
+
+    public void setMeterSealNumber(String meterSealNumber) {
+        MeterSealNumber = meterSealNumber;
+    }
+
+    public String getVerifier() {
+        return Verifier;
+    }
+
+    public void setVerifier(String verifier) {
+        Verifier = verifier;
+    }
+
+    public String getAccountTypeWord() {
+        return AccountTypeWord;
+    }
+
+    public void setAccountTypeWord(String accountTypeWord) {
+        AccountTypeWord = accountTypeWord;
     }
 }

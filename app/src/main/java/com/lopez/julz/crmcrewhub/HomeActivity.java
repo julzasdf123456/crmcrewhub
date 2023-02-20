@@ -48,6 +48,8 @@ import com.lopez.julz.crmcrewhub.database.TicketRepositoriesDao;
 import com.lopez.julz.crmcrewhub.database.Tickets;
 import com.lopez.julz.crmcrewhub.database.TicketsDao;
 import com.lopez.julz.crmcrewhub.database.TownsDao;
+import com.lopez.julz.crmcrewhub.database.Users;
+import com.lopez.julz.crmcrewhub.database.UsersDao;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.Mapbox;
@@ -153,7 +155,7 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
         scQueueTitle = findViewById(R.id.scQueueTitle);
         serviceConnectionsList = new ArrayList<>();
         inspectionsList = new ArrayList<>();
-        homeServiceConnectionsQueueAdapter = new HomeServiceConnectionsQueueAdapter(serviceConnectionsList, this, userId);
+        homeServiceConnectionsQueueAdapter = new HomeServiceConnectionsQueueAdapter(serviceConnectionsList, this, userId, crew);
         recyclerviewScHome.setAdapter(homeServiceConnectionsQueueAdapter);
         recyclerviewScHome.setLayoutManager(new LinearLayoutManager(this));
 
@@ -164,7 +166,7 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
         ticketsQueueTitle = findViewById(R.id.ticketsQueueTitle);
         recyclerviewTicketsHome = findViewById(R.id.recyclerviewTicketsHome);
         ticketsList = new ArrayList<>();
-        ticketsHomeAdapter = new TicketsHomeAdapter(ticketsList, this);
+        ticketsHomeAdapter = new TicketsHomeAdapter(ticketsList, this, crew);
         recyclerviewTicketsHome.setAdapter(ticketsHomeAdapter);
         recyclerviewTicketsHome.setLayoutManager(new LinearLayoutManager(this));
 
@@ -175,8 +177,25 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(HomeActivity.this, LoginActivity.class));
-                finish();
+//                startActivity(new Intent(HomeActivity.this, LoginActivity.class));
+//                finish();
+                AlertDialog.Builder builder = new AlertDialog.Builder(HomeActivity.this);
+                builder.setTitle("Confirmation")
+                        .setMessage("Are you sure you want to logout?")
+                        .setPositiveButton("Logout", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                new Logout().execute();
+                            }
+                        })
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                AlertDialog dialog = builder.create();
+                dialog.show();
             }
         });
 
@@ -237,10 +256,10 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
         hideView.setVisibility(View.GONE);
     }
 
-    @Override
-    public void onBackPressed() {
-        showAdminPasswordDialog();
-    }
+//    @Override
+//    public void onBackPressed() {
+//        showAdminPasswordDialog();
+//    }
 
     @Override
     public void onExplanationNeeded(List<String> permissionsToExplain) {
@@ -259,6 +278,38 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
         } else {
             Toast.makeText(this, "Permission not granted", Toast.LENGTH_LONG).show();
             finish();
+        }
+    }
+
+    public class Logout extends AsyncTask<Void, Void, Void> {
+
+        boolean isSuccessful = false;
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            try {
+                UsersDao usersDao = db.usersDao();
+                Users user = usersDao.getOneById(userId);
+                if (user != null) {
+                    user.setLoggedIn("NULL");
+                    usersDao.updateAll(user);
+                    isSuccessful = true;
+                } else {
+                    isSuccessful = false;
+                }
+            } catch (Exception e) {
+                Log.e("ERR_LGOUT", e.getMessage());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void unused) {
+            super.onPostExecute(unused);
+            if (isSuccessful) {
+                finish();
+                startActivity(new Intent(HomeActivity.this, LoginActivity.class));
+            }
         }
     }
 
@@ -348,9 +399,9 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
 
             if (ticketsList != null) {
                 int totalMakers = ticketsList.size();
-
                 for(int i=0; i<totalMakers; i++) {
                     Tickets tickets = ticketsList.get(i);
+                    Log.e("TEST", tickets.getGeoLocation());
                     if (tickets.getGeoLocation() != null) {
                         Double ticketLat = Double.valueOf(ticketsList.get(i).getGeoLocation().split(",")[0].trim());
                         Double ticketLong = Double.valueOf(ticketsList.get(i).getGeoLocation().split(",")[1].trim());

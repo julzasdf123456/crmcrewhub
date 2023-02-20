@@ -1,5 +1,7 @@
 package com.lopez.julz.crmcrewhub;
 
+import static com.lopez.julz.crmcrewhub.classes.ObjectHelpers.hasPermissions;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -40,6 +42,7 @@ import com.lopez.julz.crmcrewhub.database.Settings;
 import com.lopez.julz.crmcrewhub.database.Users;
 import com.lopez.julz.crmcrewhub.database.UsersDao;
 
+import java.lang.reflect.Method;
 import java.util.List;
 
 import retrofit2.Call;
@@ -71,6 +74,20 @@ public class LoginActivity extends AppCompatActivity {
     private static final int LOCATION = 104;
     private static final int PHONE = 105;
 
+    int PERMISSION_ALL = 1;
+    String[] PERMISSIONS = {
+            Manifest.permission.READ_PHONE_STATE,
+            android.Manifest.permission.READ_EXTERNAL_STORAGE,
+            android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            android.Manifest.permission.CAMERA,
+            android.Manifest.permission.ACCESS_FINE_LOCATION,
+            android.Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_WIFI_STATE,
+            Manifest.permission.BLUETOOTH_ADMIN,
+            Manifest.permission.BLUETOOTH,
+            Manifest.permission.ACCESS_NETWORK_STATE
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,12 +96,9 @@ public class LoginActivity extends AppCompatActivity {
         db = Room.databaseBuilder(this,
                 AppDatabase.class, ObjectHelpers.databaseName()).fallbackToDestructiveMigration().build();
 
-        checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, STORAGE_PERMISSION_WRITE);
-        checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE, STORAGE_PERMISSION_READ);
-        checkPermission(Manifest.permission.READ_PHONE_STATE, PHONE);
-        checkPermission(Manifest.permission.CAMERA, CAMERA);
-        checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, LOCATION);
-        checkPermission(Manifest.permission.ACCESS_WIFI_STATE, WIFI_PERMISSION);
+        if (!hasPermissions(this, PERMISSIONS)) {
+            ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ALL);
+        }
 
         settingsBtn = findViewById(R.id.settingsBtn);
         connectionSettingsBtn = findViewById(R.id.connectionSettingsBtn);
@@ -92,42 +106,6 @@ public class LoginActivity extends AppCompatActivity {
         settingsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                try {
-//                    AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
-//
-//                    builder.setTitle("Enter Admin Password");
-//
-//                    EditText editText = new EditText(LoginActivity.this);
-//                    editText.setInputType(InputType.TYPE_NUMBER_VARIATION_PASSWORD);
-//
-//                    builder.setView(editText);
-//
-//                    builder.setCancelable(false);
-//
-//                    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-//                        @Override
-//                        public void onClick(DialogInterface dialog, int which) {
-//                            dialog.cancel();
-//                        }
-//                    });
-//
-//                    builder.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
-//                        @Override
-//                        public void onClick(DialogInterface dialog, int which) {
-//                            if (editText.getText().toString().equals(getResources().getString(R.string.admin_pw))) {
-//                                startActivity(new Intent(LoginActivity.this, LoginSettingsActivity.class));
-//                            } else {
-//                                Toast.makeText(LoginActivity.this, "Admin password mismatch!", Toast.LENGTH_SHORT).show();
-//                            }
-//                        }
-//                    });
-//
-//                    AlertDialog alertDialog = builder.create();
-//
-//                    alertDialog.show();
-//                } catch (Exception e) {
-//                    Log.e("ERR_STRT_PWD_DLG", e.getMessage());
-//                }
                 startActivity(new Intent(LoginActivity.this, LoginSettingsActivity.class));
             }
         });
@@ -148,58 +126,12 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == WIFI_PERMISSION) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(LoginActivity.this, "Wi-Fi Permission Granted", Toast.LENGTH_SHORT) .show();
-            } else {
-                Toast.makeText(LoginActivity.this, "Wi-Fi Permission Denied", Toast.LENGTH_SHORT) .show();
-            }
-        } else if (requestCode == STORAGE_PERMISSION_READ) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(LoginActivity.this, "Storage Permission Granted", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(LoginActivity.this, "Storage Permission Denied", Toast.LENGTH_SHORT).show();
-            }
-        } else if (requestCode == STORAGE_PERMISSION_WRITE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(LoginActivity.this, "Storage Permission Granted", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(LoginActivity.this, "Storage Permission Denied", Toast.LENGTH_SHORT).show();
-            }
-        } else if (requestCode == CAMERA) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(LoginActivity.this, "Camera Permission Granted", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(LoginActivity.this, "Camera Permission Denied", Toast.LENGTH_SHORT).show();
-            }
-        } else if (requestCode == LOCATION) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(LoginActivity.this, "Location Permission Granted", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(LoginActivity.this, "Location Permission Denied", Toast.LENGTH_SHORT).show();
-            }
-        } else if (requestCode == PHONE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(LoginActivity.this, "Phone Permission Granted", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(LoginActivity.this, "Phone Permission Denied", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
 
     @Override
     protected void onResume() {
         super.onResume();
         new FetchSettings().execute();
     }
-
-//    @Override
-//    public void onBackPressed() {
-//        showAdminPasswordDialog();
-//    }
 
     private void login() {
         Login login = new Login(username.getText().toString(), password.getText().toString());
@@ -251,8 +183,12 @@ public class LoginActivity extends AppCompatActivity {
             Users existing = usersDao.getOne(strings[1], strings[2]);
 
             if (existing == null) {
-                Users users = new Users(strings[0], strings[1], strings[2]);
+                Users users = new Users(strings[0], strings[1], strings[2], "YES");
+                users.setLoggedIn("YES");
                 usersDao.insertAll(users);
+            } else {
+                existing.setLoggedIn("YES");
+                usersDao.updateAll(existing);
             }
 
             return null;
@@ -346,10 +282,10 @@ public class LoginActivity extends AppCompatActivity {
                         if (response.code() == 200) {
                             new SaveCrew().execute(response.body());
                         } else {
-                            Log.e("ER_GET_CREW", response.errorBody() + "");
+                            Log.e("ER_GET_CREW", response.errorBody() + "" + response.raw());
                         }
                     } else {
-                        Log.e("ER_GET_CREW", response.errorBody() + "");
+                        Log.e("ER_GET_CREW", response.errorBody() + "" + response.raw());
                     }
                 }
 
@@ -458,31 +394,106 @@ public class LoginActivity extends AppCompatActivity {
 
                 new GetAppConfig().execute();
 
+                new CommenceAutoLogin().execute();
+            } else {
+                startActivity(new Intent(LoginActivity.this, ConnectionSettingsActivity.class));
+            }
+        }
+    }
+
+    public class CommenceAutoLogin extends AsyncTask<Void, Void, Void> {
+
+        boolean doesUserExists = false;
+        String userid = "";
+        String usernameT, passwordT;
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            try {
+                UsersDao usersDao = db.usersDao();
+                Users existing = usersDao.getFirst();
+
+                AppConfigDao appConfigDao = db.appConfigDao();
+
+                AppConfig appConfig = appConfigDao.getConfig();
+
+                CREW = appConfig.getDeviceStation();
+
+                if (existing == null) {
+                    doesUserExists = false;
+                } else {
+                    if (existing.getLoggedIn() != null && existing.getLoggedIn().equals("YES")) {
+                        doesUserExists = true;
+                        userid = existing.getId();
+                        usernameT = existing.getUsername();
+                        passwordT = existing.getPassword();
+                    } else {
+                        doesUserExists = false;
+                    }
+
+                }
+            } catch (Exception e) {
+                Log.e("ERR_AUTO_LGN", e.getMessage());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void unused) {
+            super.onPostExecute(unused);
+            if (doesUserExists) {
+                Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                intent.putExtra("CREW", CREW);
+                intent.putExtra("USERID", userid);
+                startActivity(intent);
+                finish();
+            } else {
                 loginBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onClick(View v) {
+                    public void onClick(View view) {
                         ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
                         NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 
+                        // CHECK MOBILE DATA
+                        boolean mobileDataEnabled = false;
+                        try {
+                            Class cmClass = Class.forName(connManager.getClass().getName());
+                            Method method = cmClass.getDeclaredMethod("getMobileDataEnabled");
+                            method.setAccessible(true); // Make the method callable
+                            // get the setting for "mobile data"
+                            mobileDataEnabled = (Boolean)method.invoke(connManager);
+                        } catch (Exception e) {
+                            // Some problem accessible private API
+                            // TODO do whatever error handling you want here
+                        }
+
                         if (mWifi.isConnected()) {
-                            // PERFORM ONLINE LOGIN
+                            // PERFORM ONLINE LOGIN USING WIFI
                             if (username.getText().equals("") | null == username.getText() | password.getText().equals("") | null == password.getText()) {
                                 Snackbar.make(username, "Please fill in the fields to login", Snackbar.LENGTH_LONG).show();
                             } else {
                                 login();
                             }
                         } else {
-                            // PERFORM OFFLINE LOGIN
-                            if (username.getText().equals("") | null == username.getText() | password.getText().equals("") | null == password.getText()) {
-                                Snackbar.make(username, "Please fill in the fields to login", Snackbar.LENGTH_LONG).show();
+                            if (mobileDataEnabled) {
+                                // PERFORM ONLINE LOGIN USING MOBILE DATA
+                                if (username.getText().equals("") | null == username.getText() | password.getText().equals("") | null == password.getText()) {
+                                    Snackbar.make(username, "Please fill in the fields to login", Snackbar.LENGTH_LONG).show();
+                                } else {
+                                    login();
+                                }
                             } else {
-                                new LoginOffline().execute(username.getText().toString(), password.getText().toString());
+                                // PERFORM OFFLINE LOGIN
+                                if (username.getText().equals("") | null == username.getText() | password.getText().equals("") | null == password.getText()) {
+                                    Snackbar.make(username, "Please fill in the fields to login", Snackbar.LENGTH_LONG).show();
+                                } else {
+                                    new LoginOffline().execute(username.getText().toString(), password.getText().toString());
+                                }
                             }
+
                         }
                     }
                 });
-            } else {
-                startActivity(new Intent(LoginActivity.this, ConnectionSettingsActivity.class));
             }
         }
     }

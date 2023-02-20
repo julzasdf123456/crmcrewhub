@@ -16,7 +16,7 @@ import com.lopez.julz.crmcrewhub.classes.Towns;
         Tickets.class,
         Crew.class,
         AppConfig.class,
-        Settings.class}, version = 38)
+        Settings.class}, version = 45)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract UsersDao usersDao();
 

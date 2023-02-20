@@ -353,6 +353,7 @@ public class UploadActivity extends AppCompatActivity {
                     Tickets tk = tickets[0];
                     tk.setUploadStatus("UPLOADED");
                     db.ticketsDao().updateAll(tk);
+                    db.ticketsDao().deleteOne(tk.getId());
                 }
             } catch (Exception e) {
                 Log.e("ERR_UPDT_TICKT", e.getMessage());

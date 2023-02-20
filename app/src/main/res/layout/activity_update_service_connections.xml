@@ -7,6 +7,18 @@
     android:layout_height="match_parent"
     tools:context=".UpdateServiceConnectionsActivity">
 
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/savebtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        app:icon="@drawable/ic_baseline_save_24"
+        app:iconTint="@color/white"
+        android:text="Save"
+        android:textColor="@color/white"
+        android:layout_marginBottom="10dp"
+        android:layout_marginRight="10dp"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -27,204 +39,447 @@
 
         </androidx.appcompat.widget.Toolbar>
 
-
-        <TableLayout
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
 
-            <TableRow
-                android:layout_width="match_parent">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-                <LinearLayout
+                <TableLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:layout_column="1"
-                    android:layout_weight="1">
+                    android:layout_height="match_parent">
 
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:contentPadding="10dp"
-                        android:layout_margin="5dp">
+                    <TableRow
+                        android:layout_width="match_parent">
 
-                        <ScrollView
+                        <!-- DETAILS -->
+                        <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent">
+                            android:layout_height="match_parent"
+                            android:orientation="vertical"
+                            android:layout_column="2"
+                            android:layout_weight="2">
 
-                            <LinearLayout
+                            <com.google.android.material.card.MaterialCardView
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:orientation="vertical">
+                                app:contentPadding="10dp"
+                                android:layout_margin="5dp">
 
-                                <!-- ARRIVAL -->
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Date and Time of Arrival"
-                                    android:drawableLeft="@drawable/ic_round_access_time_24"
-                                    android:drawablePadding="10dp"/>
-
-                                <RelativeLayout
+                                <ScrollView
                                     android:layout_width="match_parent"
-                                    android:layout_height="wrap_content">
+                                    android:layout_height="match_parent">
 
-                                    <com.google.android.material.button.MaterialButton
-                                        android:id="@+id/markTimeOfArrivalBtn"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_alignParentLeft="true"
-                                        android:text="mark" />
-
-                                    <EditText
-                                        android:id="@+id/arrivalDateTime"
+                                    <LinearLayout
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:layout_marginLeft="5dp"
-                                        android:layout_marginTop="5dp"
-                                        android:layout_marginRight="5dp"
-                                        android:layout_marginBottom="15dp"
-                                        android:layout_toRightOf="@+id/markTimeOfArrivalBtn"
-                                        android:background="@drawable/options_custom_form"
-                                        android:enabled="false"
-                                        android:hint="Time"
-                                        android:inputType="text"
-                                        android:paddingLeft="15dp"
-                                        android:paddingTop="7dp"
-                                        android:paddingRight="10dp"
-                                        android:paddingBottom="7dp" />
+                                        android:orientation="vertical">
 
-                                </RelativeLayout>
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="Service Connection Details"
+                                            android:drawableLeft="@drawable/ic_baseline_assignment_24"
+                                            android:drawableTint="@color/sc_primary_700"
+                                            android:textColor="@color/sc_primary_700"
+                                            android:drawablePadding="10dp"/>
 
-                                <View
+                                        <View
+                                            android:layout_width="match_parent"
+                                            android:layout_height="1px"
+                                            android:layout_marginTop="5dp"
+                                            android:layout_marginBottom="5dp"
+                                            android:background="@color/grey_light"/>
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:textSize="7pt"
+                                            android:text="Energization ID"/>
+
+                                        <TextView
+                                            android:id="@+id/id"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:textColor="@color/black"
+                                            android:background="@drawable/options_custom_form"
+                                            android:padding="8dp"
+                                            android:layout_marginBottom="10dp"/>
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:textSize="7pt"
+                                            android:text="Address"/>
+
+                                        <TextView
+                                            android:id="@+id/address"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:textColor="@color/black"
+                                            android:background="@drawable/options_custom_form"
+                                            android:padding="8dp"
+                                            android:layout_marginBottom="10dp"/>
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:textSize="7pt"
+                                            android:text="Meter Number"/>
+
+                                        <TextView
+                                            android:id="@+id/meterNumber"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:textColor="@color/black"
+                                            android:background="@drawable/options_custom_form"
+                                            android:padding="8dp"
+                                            android:layout_marginBottom="10dp"/>
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:textSize="7pt"
+                                            android:text="Meter Brand"/>
+
+                                        <TextView
+                                            android:id="@+id/meterBrand"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:textColor="@color/black"
+                                            android:background="@drawable/options_custom_form"
+                                            android:padding="8dp"
+                                            android:layout_marginBottom="10dp"/>
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:textSize="7pt"
+                                            android:text="Meter Seal"/>
+
+                                        <TextView
+                                            android:id="@+id/meterSeal"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:textColor="@color/black"
+                                            android:background="@drawable/options_custom_form"
+                                            android:padding="8dp"
+                                            android:layout_marginBottom="10dp"/>
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:textSize="7pt"
+                                            android:text="Verifier"/>
+
+                                        <TextView
+                                            android:id="@+id/verifier"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:textColor="@color/black"
+                                            android:background="@drawable/options_custom_form"
+                                            android:padding="8dp"
+                                            android:layout_marginBottom="10dp"/>
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:textSize="7pt"
+                                            android:text="Account Type"/>
+
+                                        <TextView
+                                            android:id="@+id/acctType"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:textColor="@color/black"
+                                            android:background="@drawable/options_custom_form"
+                                            android:padding="8dp"
+                                            android:layout_marginBottom="10dp"/>
+
+                                    </LinearLayout>
+
+                                </ScrollView>
+
+                            </com.google.android.material.card.MaterialCardView>
+
+                        </LinearLayout>
+
+                        <!-- UPDATE FORM -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical"
+                            android:layout_column="2"
+                            android:layout_weight="3">
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                app:contentPadding="10dp"
+                                app:cardBackgroundColor="@color/sc_primary_500"
+                                android:layout_margin="5dp">
+
+                                <ScrollView
                                     android:layout_width="match_parent"
-                                    android:layout_height="1px"
-                                    android:background="@color/grey_light"
-                                    android:layout_marginTop="10dp"
-                                    android:layout_marginBottom="15dp"/>
+                                    android:layout_height="match_parent">
 
-                                <!-- ENERGIZED -->
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Date and Time of Energization"
-                                    android:drawableLeft="@drawable/ic_baseline_access_time_filled_24"
-                                    android:drawablePadding="10dp"/>
-
-                                <RelativeLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content">
-
-                                    <com.google.android.material.button.MaterialButton
-                                        android:id="@+id/markTimeOfEnergizationBtn"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_alignParentLeft="true"
-                                        android:text="mark" />
-
-                                    <EditText
-                                        android:id="@+id/energizationDateTime"
+                                    <LinearLayout
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:layout_marginLeft="5dp"
-                                        android:layout_marginTop="5dp"
-                                        android:layout_marginRight="5dp"
-                                        android:layout_marginBottom="15dp"
-                                        android:layout_toRightOf="@+id/markTimeOfEnergizationBtn"
-                                        android:background="@drawable/options_custom_form"
-                                        android:enabled="false"
-                                        android:hint="Time"
-                                        android:inputType="text"
-                                        android:paddingLeft="15dp"
-                                        android:paddingTop="7dp"
-                                        android:paddingRight="10dp"
-                                        android:paddingBottom="7dp" />
+                                        android:orientation="vertical">
 
-                                </RelativeLayout>
+                                        <!-- ARRIVAL -->
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="Date and Time of Arrival"
+                                            android:drawableLeft="@drawable/ic_round_access_time_24"
+                                            android:textColor="@color/white"
+                                            android:drawableTint="@color/white"
+                                            android:drawablePadding="10dp"/>
 
-                                <View
-                                    android:layout_width="match_parent"
-                                    android:layout_height="1px"
-                                    android:background="@color/grey_light"
-                                    android:layout_marginTop="10dp"
-                                    android:layout_marginBottom="15dp"/>
+                                        <RelativeLayout
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content">
 
-                                <!-- ASSESSMENT -->
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Assessment"
-                                    android:drawableLeft="@drawable/ic_round_library_add_check_24"
-                                    android:drawablePadding="10dp"/>
+                                            <com.google.android.material.button.MaterialButton
+                                                android:id="@+id/markTimeOfArrivalBtn"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:layout_alignParentLeft="true"
+                                                app:backgroundTint="@color/white"
+                                                android:textColor="@color/sc_primary_700"
+                                                android:text="mark" />
 
-                                <RadioGroup
-                                    android:id="@+id/assessment"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:orientation="horizontal">
+                                            <EditText
+                                                android:id="@+id/arrivalDateTime"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginLeft="5dp"
+                                                android:layout_marginTop="5dp"
+                                                android:layout_marginRight="5dp"
+                                                android:layout_marginBottom="15dp"
+                                                android:layout_toRightOf="@+id/markTimeOfArrivalBtn"
+                                                android:layout_toLeftOf="@id/editTimeOfArrivalBtn"
+                                                android:background="@drawable/options_custom_form"
+                                                android:enabled="false"
+                                                android:hint="Time"
+                                                android:inputType="text"
+                                                android:textColor="@color/white"
+                                                android:paddingLeft="15dp"
+                                                android:paddingTop="7dp"
+                                                android:paddingRight="10dp"
+                                                android:paddingBottom="7dp" />
 
-                                    <RadioButton
-                                        android:id="@+id/opsEnergized"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="Energized"
-                                        android:layout_marginRight="15dp"
-                                        android:layout_marginLeft="15dp"/>
+                                            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                                                android:id="@+id/editTimeOfArrivalBtn"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:layout_alignParentRight="true"
+                                                app:backgroundTint="@color/white"
+                                                android:textColor="@color/sc_primary_500"
+                                                app:fabSize="mini"
+                                                android:src="@drawable/ic_baseline_update_24"
+                                                app:tint="@color/sc_primary_700"/>
 
-                                    <RadioButton
-                                        android:id="@+id/opsNotEnergized"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="Not Energized"
-                                        android:layout_marginRight="15dp"
-                                        android:layout_marginLeft="15dp"
-                                        android:paddingBottom="5dp"/>
+                                        </RelativeLayout>
 
-                                </RadioGroup>
+                                        <View
+                                            android:layout_width="match_parent"
+                                            android:layout_height="1px"
+                                            android:background="@color/grey_light"
+                                            android:layout_marginTop="10dp"
+                                            android:layout_marginBottom="15dp"/>
 
-                                <EditText
-                                    android:id="@+id/remarks"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:hint="Remarks and Notes"
-                                    android:inputType="text|textMultiLine"
-                                    android:layout_marginBottom="15dp"
-                                    android:background="@drawable/options_custom_form"
-                                    android:paddingTop="7dp"
-                                    android:paddingBottom="7dp"
-                                    android:paddingLeft="15dp"
-                                    android:paddingRight="10dp"
-                                    android:layout_toRightOf="@+id/markTimeOfEnergizationBtn"
-                                    android:layout_marginTop="5dp"
-                                    android:layout_marginLeft="5dp"
-                                    android:layout_marginRight="5dp"
-                                    android:lines="3"
-                                    android:gravity="left|top"/>
+                                        <!-- ENERGIZED -->
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="Date and Time of Energization"
+                                            android:textColor="@color/white"
+                                            android:drawableTint="@color/white"
+                                            android:drawableLeft="@drawable/ic_baseline_access_time_filled_24"
+                                            android:drawablePadding="10dp"/>
 
-                            </LinearLayout>
+                                        <RelativeLayout
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content">
 
-                        </ScrollView>
+                                            <com.google.android.material.button.MaterialButton
+                                                android:id="@+id/markTimeOfEnergizationBtn"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:layout_alignParentLeft="true"
+                                                app:backgroundTint="@color/white"
+                                                android:textColor="@color/sc_primary_700"
+                                                android:text="mark" />
 
-                    </com.google.android.material.card.MaterialCardView>
-                </LinearLayout>
+                                            <EditText
+                                                android:id="@+id/energizationDateTime"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginLeft="5dp"
+                                                android:layout_marginTop="5dp"
+                                                android:layout_marginRight="5dp"
+                                                android:layout_marginBottom="15dp"
+                                                android:layout_toRightOf="@+id/markTimeOfEnergizationBtn"
+                                                android:background="@drawable/options_custom_form"
+                                                android:layout_toLeftOf="@id/editTimeOfEnergizationBtn"
+                                                android:enabled="false"
+                                                android:hint="Time"
+                                                android:inputType="text"
+                                                android:textColor="@color/white"
+                                                android:paddingLeft="15dp"
+                                                android:paddingTop="7dp"
+                                                android:paddingRight="10dp"
+                                                android:paddingBottom="7dp" />
 
+                                            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                                                android:id="@+id/editTimeOfEnergizationBtn"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:layout_alignParentRight="true"
+                                                app:backgroundTint="@color/white"
+                                                android:textColor="@color/sc_primary_700"
+                                                app:fabSize="mini"
+                                                android:src="@drawable/ic_baseline_update_24"
+                                                app:tint="@color/sc_primary_700"/>
+
+                                        </RelativeLayout>
+
+                                        <View
+                                            android:layout_width="match_parent"
+                                            android:layout_height="1px"
+                                            android:background="@color/grey_light"
+                                            android:layout_marginTop="10dp"
+                                            android:layout_marginBottom="15dp"/>
+
+                                        <!-- ASSESSMENT -->
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="Assessment"
+                                            android:textColor="@color/white"
+                                            android:drawableTint="@color/white"
+                                            android:drawableLeft="@drawable/ic_round_library_add_check_24"
+                                            android:drawablePadding="10dp"/>
+
+                                        <RadioGroup
+                                            android:id="@+id/assessment"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:orientation="horizontal">
+
+                                            <RadioButton
+                                                android:id="@+id/opsEnergized"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:text="Energized"
+                                                android:textColor="@color/white"
+                                                android:layout_marginRight="15dp"
+                                                android:layout_marginLeft="15dp"/>
+
+                                            <RadioButton
+                                                android:id="@+id/opsNotEnergized"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:text="Not Energized"
+                                                android:textColor="@color/white"
+                                                android:layout_marginRight="15dp"
+                                                android:layout_marginLeft="15dp"
+                                                android:paddingBottom="5dp"/>
+
+                                        </RadioGroup>
+
+                                        <!-- CREW -->
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="Crew/Lineman Executed"
+                                            android:textColor="@color/white"
+                                            android:drawableTint="@color/white"
+                                            android:drawableLeft="@drawable/ic_baseline_hardware_24"
+                                            android:drawablePadding="10dp"/>
+
+                                        <EditText
+                                            android:id="@+id/crewExecuted"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:hint="Name of Lineman/Crew"
+                                            android:inputType="text"
+                                            android:layout_marginBottom="15dp"
+                                            android:background="@drawable/options_custom_form"
+                                            android:paddingTop="7dp"
+                                            android:paddingBottom="7dp"
+                                            android:paddingLeft="15dp"
+                                            android:paddingRight="10dp"
+                                            android:textColorHint="@color/grey_light"
+                                            android:textColor="@color/white"
+                                            android:layout_toRightOf="@+id/markTimeOfEnergizationBtn"
+                                            android:layout_marginTop="5dp"
+                                            android:layout_marginLeft="5dp"
+                                            android:layout_marginRight="5dp"
+                                            android:lines="3"
+                                            android:gravity="left|top"/>
+
+                                        <!-- REMARKS -->
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="Remarks/Notes"
+                                            android:textColor="@color/white"
+                                            android:drawableTint="@color/white"
+                                            android:drawableLeft="@drawable/ic_baseline_comment_24"
+                                            android:drawablePadding="10dp"/>
+
+                                        <EditText
+                                            android:id="@+id/remarks"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:hint="Remarks and Notes"
+                                            android:inputType="text|textMultiLine"
+                                            android:layout_marginBottom="15dp"
+                                            android:background="@drawable/options_custom_form"
+                                            android:paddingTop="7dp"
+                                            android:paddingBottom="7dp"
+                                            android:paddingLeft="15dp"
+                                            android:paddingRight="10dp"
+                                            android:textColor="@color/white"
+                                            android:layout_toRightOf="@+id/markTimeOfEnergizationBtn"
+                                            android:layout_marginTop="5dp"
+                                            android:layout_marginLeft="5dp"
+                                            android:layout_marginRight="5dp"
+                                            android:lines="3"
+                                            android:gravity="left|top"/>
+
+                                    </LinearLayout>
+
+                                </ScrollView>
+
+                            </com.google.android.material.card.MaterialCardView>
+                        </LinearLayout>
+                    </TableRow>
+                </TableLayout>
+
+                <!-- MAP -->
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:layout_column="2"
-                    android:layout_weight="2">
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
                     <com.mapbox.mapboxsdk.maps.MapView
                         android:id="@+id/mapViewUpdate"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="300dp"
                         app:mapbox_cameraZoom="15"/>
-
                 </LinearLayout>
 
-            </TableRow>
-        </TableLayout>
+            </LinearLayout>
+
+        </ScrollView>
 
     </LinearLayout>
 

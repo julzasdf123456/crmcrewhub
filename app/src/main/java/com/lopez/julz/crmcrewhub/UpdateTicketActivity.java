@@ -17,14 +17,22 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.lopez.julz.crmcrewhub.classes.ObjectHelpers;
 import com.lopez.julz.crmcrewhub.database.AppDatabase;
 import com.lopez.julz.crmcrewhub.database.BarangaysDao;
+import com.lopez.julz.crmcrewhub.database.Crew;
+import com.lopez.julz.crmcrewhub.database.CrewDao;
 import com.lopez.julz.crmcrewhub.database.TicketRepositories;
 import com.lopez.julz.crmcrewhub.database.TicketRepositoriesDao;
 import com.lopez.julz.crmcrewhub.database.Tickets;
 import com.lopez.julz.crmcrewhub.database.TicketsDao;
 import com.lopez.julz.crmcrewhub.database.TownsDao;
+import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
+import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
+
+import java.util.Calendar;
 
 public class UpdateTicketActivity extends AppCompatActivity {
 
@@ -35,15 +43,20 @@ public class UpdateTicketActivity extends AppCompatActivity {
 
     public Tickets ticket;
 
-    public TextView accountName, ticketNo, ticketType, reason, address, contact, acctNo;
+    public TextView accountName, ticketNo, ticketType, reason, address, contact, acctNo, poleNumber;
 
     public MaterialButton markTimeOfArrivalBtn, markTimeOfEnergizationBtn;
-    public EditText arrivalDateTime, energizationDateTime, remarks;
+    public EditText arrivalDateTime, energizationDateTime, remarks, coordinates, crewExecuted;
     public RadioGroup assessment;
     public RadioButton forAveraging;
+    public FloatingActionButton editTimeOfArrivalBtn, editTimeOfEnergizationBtn;
 
     public TextView oldMeterSerial, oldMeterBrand;
     public EditText oldMeterReading, newMeterSerial, newMeterBrand, newMeterReading;
+
+    private String crew;
+
+    private ExtendedFloatingActionButton savebtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +65,8 @@ public class UpdateTicketActivity extends AppCompatActivity {
 
         ticketId = getIntent().getExtras().getString("ID");
         db = Room.databaseBuilder(this, AppDatabase.class, ObjectHelpers.databaseName()).fallbackToDestructiveMigration().build();
+
+        crew = getIntent().getExtras().getString("CREW");
 
         updateTicketsToolbar = findViewById(R.id.updateTicketsToolbar);
         setSupportActionBar(updateTicketsToolbar);
@@ -80,6 +95,12 @@ public class UpdateTicketActivity extends AppCompatActivity {
         newMeterBrand = findViewById(R.id.newMeterBrand);
         newMeterReading = findViewById(R.id.newMeterReading);
         forAveraging = findViewById(R.id.forAveraging);
+        coordinates = findViewById(R.id.coordinates);
+        poleNumber = findViewById(R.id.poleNumber);
+        editTimeOfArrivalBtn = findViewById(R.id.editTimeOfArrivalBtn);
+        editTimeOfEnergizationBtn = findViewById(R.id.editTimeOfEnergizationBtn);
+        crewExecuted = findViewById(R.id.crewExecuted);
+        savebtn = findViewById(R.id.savebtn);
 
         new GetTicketDetails().execute();
 
@@ -96,6 +117,133 @@ public class UpdateTicketActivity extends AppCompatActivity {
                 arrivalDateTime.setText(ObjectHelpers.getDateTime());
             }
         });
+
+        savebtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ticket.setDateTimeLinemanArrived(arrivalDateTime.getText().toString());
+                ticket.setDateTimeLinemanExecuted(energizationDateTime.getText().toString());
+                ticket.setStatus(ObjectHelpers.getSelectedTextFromRadioGroup(assessment, getWindow().getDecorView()));
+                String status = ticket.getStatus();
+                if (status != null) {
+                    ticket.setUploadStatus("UPLOADABLE");
+                }
+                ticket.setNotes(remarks.getText().toString());
+
+                if (forAveraging.isChecked()) {
+                    ticket.setPercentError("FOR AVERAGING");
+                }
+
+                ticket.setCurrentMeterReading(oldMeterReading.getText().toString());
+                ticket.setNewMeterBrand(newMeterBrand.getText().toString());
+                ticket.setNewMeterNo(newMeterSerial.getText().toString());
+                ticket.setNewMeterReading(newMeterReading.getText().toString());
+                ticket.setGeoLocation(coordinates.getText().toString());
+                ticket.setLinemanCrewExecuted(crewExecuted.getText().toString());
+                new UpdateTicket().execute(ticket);
+                finish();
+            }
+        });
+
+        editTimeOfArrivalBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+
+                    Calendar now = Calendar.getInstance();
+                    DatePickerDialog dpd = DatePickerDialog.newInstance(
+                            new DatePickerDialog.OnDateSetListener() {
+                                @Override
+                                public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
+                                    /**
+                                     * GET SELECTED DAY
+                                     */
+                                    String time = ObjectHelpers.getDateFromDatePicker(year + "-" + (monthOfYear+1) + "-" + dayOfMonth);
+
+                                    /*
+                                     * INITIALIZE TIME
+                                     */
+                                    TimePickerDialog tpd = TimePickerDialog.newInstance(
+                                            new TimePickerDialog.OnTimeSetListener() {
+                                                @Override
+                                                public void onTimeSet(TimePickerDialog view, int hourOfDay, int minute, int second) {
+                                                    arrivalDateTime.setText(time + " " + hourOfDay + ":" + minute + ":" + second);
+                                                }
+                                            },
+                                            now.get(Calendar.HOUR_OF_DAY),
+                                            now.get(Calendar.MINUTE),
+                                            true
+                                    );
+
+                                    tpd.setVersion(TimePickerDialog.Version.VERSION_2);
+                                    tpd.setOkText("SELECT");
+                                    tpd.setCancelText("CLOSE");
+                                    tpd.show(getSupportFragmentManager(), "Select Time");
+                                }
+                            },
+                            now.get(Calendar.YEAR), // Initial year selection
+                            now.get(Calendar.MONTH), // Initial month selection
+                            now.get(Calendar.DAY_OF_MONTH) // Inital day selection
+                    );
+                    dpd.setVersion(DatePickerDialog.Version.VERSION_2);
+                    dpd.setOkText("SELECT");
+                    dpd.setCancelText("CLOSE");
+                    dpd.show(getSupportFragmentManager(), "Select Date");
+                } catch (Exception e) {
+                    Log.e("ERR_DT_PCKR", e.getMessage());
+                }
+            }
+        });
+
+        editTimeOfEnergizationBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+
+                    Calendar now = Calendar.getInstance();
+                    DatePickerDialog dpd = DatePickerDialog.newInstance(
+                            new DatePickerDialog.OnDateSetListener() {
+                                @Override
+                                public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
+                                    /**
+                                     * GET SELECTED DAY
+                                     */
+                                    String time = ObjectHelpers.getDateFromDatePicker(year + "-" + (monthOfYear+1) + "-" + dayOfMonth);
+
+                                    /*
+                                     * INITIALIZE TIME
+                                     */
+                                    TimePickerDialog tpd = TimePickerDialog.newInstance(
+                                            new TimePickerDialog.OnTimeSetListener() {
+                                                @Override
+                                                public void onTimeSet(TimePickerDialog view, int hourOfDay, int minute, int second) {
+                                                    energizationDateTime.setText(time + " " + hourOfDay + ":" + minute + ":" + second);
+                                                }
+                                            },
+                                            now.get(Calendar.HOUR_OF_DAY),
+                                            now.get(Calendar.MINUTE),
+                                            true
+                                    );
+
+                                    tpd.setVersion(TimePickerDialog.Version.VERSION_2);
+                                    tpd.setOkText("SELECT");
+                                    tpd.setCancelText("CLOSE");
+                                    tpd.show(getSupportFragmentManager(), "Select Time");
+                                }
+                            },
+                            now.get(Calendar.YEAR), // Initial year selection
+                            now.get(Calendar.MONTH), // Initial month selection
+                            now.get(Calendar.DAY_OF_MONTH) // Inital day selection
+                    );
+                    dpd.setVersion(DatePickerDialog.Version.VERSION_2);
+                    dpd.setOkText("SELECT");
+                    dpd.setCancelText("CLOSE");
+                    dpd.show(getSupportFragmentManager(), "Select Date");
+                } catch (Exception e) {
+                    Log.e("ERR_DT_PCKR", e.getMessage());
+                }
+            }
+        });
     }
 
     @Override
@@ -105,7 +253,7 @@ public class UpdateTicketActivity extends AppCompatActivity {
             ticket.setDateTimeLinemanExecuted(energizationDateTime.getText().toString());
             ticket.setStatus(ObjectHelpers.getSelectedTextFromRadioGroup(assessment, getWindow().getDecorView()));
             String status = ticket.getStatus();
-            if (status != null && status.equals("Executed")) {
+            if (status != null) {
                 ticket.setUploadStatus("UPLOADABLE");
             }
             ticket.setNotes(remarks.getText().toString());
@@ -118,6 +266,8 @@ public class UpdateTicketActivity extends AppCompatActivity {
             ticket.setNewMeterBrand(newMeterBrand.getText().toString());
             ticket.setNewMeterNo(newMeterSerial.getText().toString());
             ticket.setNewMeterReading(newMeterReading.getText().toString());
+            ticket.setGeoLocation(coordinates.getText().toString());
+            ticket.setLinemanCrewExecuted(crewExecuted.getText().toString());
             new UpdateTicket().execute(ticket);
             finish();
         }
@@ -138,11 +288,17 @@ public class UpdateTicketActivity extends AppCompatActivity {
             }
             return null;
         }
+
+        @Override
+        protected void onPostExecute(Void unused) {
+            super.onPostExecute(unused);
+            Toast.makeText(UpdateTicketActivity.this, "Ticket updated and saved!", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public class GetTicketDetails extends AsyncTask<Void, Void, Void> {
 
-        private String ticketName, consumeraddress, accountno;
+        private String ticketName, consumeraddress, accountno, loggedcrew;
 
         @Override
         protected Void doInBackground(Void... voids) {
@@ -154,6 +310,10 @@ public class UpdateTicketActivity extends AppCompatActivity {
 
                 ticket = ticketsDao.getOne(ticketId);
                 TicketRepositories ticketSource = ticketRepositories.getOne(ticket.getTicket());
+
+                CrewDao crewDao = db.crewDao();
+                Crew crewDetails = crewDao.getOne(crew);
+                loggedcrew = crewDetails != null ? crewDetails.getStationName() : "-";
 
                 ticketName = ticketRepositories.getOne(ticketSource.getParentTicket()) != null ? (ticketRepositories.getOne(ticketSource.getParentTicket()).getName() + "-" + ticketSource.getName()) : ticketSource.getName();
                 consumeraddress = ticket.getSitio() + ", " + barangaysDao.getOne(ticket.getBarangay()).getBarangay() + ", " + townsDao.getOne(ticket.getTown()).getTown();
@@ -184,12 +344,21 @@ public class UpdateTicketActivity extends AppCompatActivity {
                 energizationDateTime.setText(ticket.getDateTimeLinemanExecuted());
                 arrivalDateTime.setText(ticket.getDateTimeLinemanArrived());
                 remarks.setText(ticket.getNotes());
+                coordinates.setText(ticket.getGeoLocation());
+                poleNumber.setText(ticket.getPoleNumber());
+                if (ticket.getLinemanCrewExecuted() != null) {
+                    crewExecuted.setText(ticket.getLinemanCrewExecuted());
+                } else {
+                    crewExecuted.setText(loggedcrew);
+                }
 
                 if (ticket.getStatus() != null) {
                     if (ticket.getStatus().equals("Not Executed")) {
                         assessment.check(R.id.opsNotExecuted);
                     } else if(ticket.getStatus().equals("Executed")) {
                         assessment.check(R.id.opsExecuted);
+                    } else if(ticket.getStatus().equals("Acted")) {
+                        assessment.check(R.id.opsActed);
                     }
                 }
 
@@ -206,6 +375,8 @@ public class UpdateTicketActivity extends AppCompatActivity {
         if (recommendation != null) {
             if (recommendation.equals("Executed")) {
                 return R.id.opsExecuted;
+            } else if (recommendation.equals("Acted")) {
+                return R.id.opsActed;
             } else {
                 return R.id.opsNotExecuted;
             }

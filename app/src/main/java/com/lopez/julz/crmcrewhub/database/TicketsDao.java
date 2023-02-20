@@ -23,4 +23,7 @@ public interface TicketsDao {
 
     @Query("SELECT * FROM Tickets WHERE UploadStatus = 'UPLOADABLE'")
     List<Tickets> getUploadableTickets();
+
+    @Query("DELETE FROM Tickets WHERE id = :id")
+    void deleteOne(String id);
 }

@@ -37,6 +37,7 @@ public class TicketsHomeAdapter extends RecyclerView.Adapter<TicketsHomeAdapter.
     private List<Tickets> ticketsList;
     private Context context;
     private MapViewListener mapViewListener;
+    private String crew;
 
     private AppDatabase db;
 
@@ -44,10 +45,11 @@ public class TicketsHomeAdapter extends RecyclerView.Adapter<TicketsHomeAdapter.
         public void changeLocation(int position);
     }
 
-    public TicketsHomeAdapter(List<Tickets> ticketsList, Context context) {
+    public TicketsHomeAdapter(List<Tickets> ticketsList, Context context, String crew) {
         this.ticketsList = ticketsList;
         this.context = context;
 //        this.mapViewListener = mapViewListener;
+        this.crew = crew;
         db = Room.databaseBuilder(context, AppDatabase.class, ObjectHelpers.databaseName()).fallbackToDestructiveMigration().build();
     }
 
@@ -147,7 +149,7 @@ public class TicketsHomeAdapter extends RecyclerView.Adapter<TicketsHomeAdapter.
 
                     ticketName = ticketRepositoriesDao.getOne(ticketSource.getParentTicket()) != null ? (ticketRepositoriesDao.getOne(ticketSource.getParentTicket()).getName() + "-" + ticketSource.getName()) : ticketSource.getName();
                     consumername = ticket.getConsumerName();
-                    consumeraddress = ticket.getBarangay() != null ? (ticket.getSitio() + ", " + barangaysDao.getOne(ticket.getBarangay()).getBarangay() + ", " + townsDao.getOne(ticket.getTown()).getTown()) : ticket.getSitio();
+                    consumeraddress = ticket.getBarangay() != null ? ((ticket.getSitio() != null ? ticket.getSitio() + ", " : "") + barangaysDao.getOne(ticket.getBarangay()).getBarangay() + ", " + townsDao.getOne(ticket.getTown()).getTown()) : ticket.getSitio();
                     accountno = ticket.getAccountNumber();
                 }
             } catch (Exception e) {
@@ -176,6 +178,7 @@ public class TicketsHomeAdapter extends RecyclerView.Adapter<TicketsHomeAdapter.
                 public void onClick(View v) {
                     Intent intent = new Intent(context, UpdateTicketActivity.class);
                     intent.putExtra("ID", ticket.getId());
+                    intent.putExtra("CREW", crew);
                     context.startActivity(intent);
                 }
             });

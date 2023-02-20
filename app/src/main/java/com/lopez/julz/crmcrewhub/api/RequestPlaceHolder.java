@@ -52,6 +52,9 @@ public interface RequestPlaceHolder {
     @GET("update-downloaded-service-connection-status")
     Call<Void> updateDownloadedServiceConnectionStatus(@Query("CrewAssigned")String crewAssigned, @Query("User") String User, @Query("Status") String Status);
 
+    @POST("notify-downloaded")
+    Call<Void> notifyDownloaded(@Query("ServiceAccountName")String ServiceAccountName, @Query("ContactNumber") String ContactNumber, @Query("id") String id);
+
     /**
      * Tickets
      */

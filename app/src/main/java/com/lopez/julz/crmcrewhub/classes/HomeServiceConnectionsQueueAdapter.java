@@ -32,11 +32,13 @@ public class HomeServiceConnectionsQueueAdapter extends RecyclerView.Adapter<Hom
     public String userId;
     public AppDatabase db;
     private ShowOnMap showOnMap;
+    private String crew;
 
-    public HomeServiceConnectionsQueueAdapter(List<ServiceConnections> serviceConnectionsList, Context context, String userId) {
+    public HomeServiceConnectionsQueueAdapter(List<ServiceConnections> serviceConnectionsList, Context context, String userId, String crew) {
         this.serviceConnectionsList = serviceConnectionsList;
         this.context = context;
         this.userId = userId;
+        this.crew = crew;
         db = Room.databaseBuilder(context,
                 AppDatabase.class, ObjectHelpers.databaseName()).fallbackToDestructiveMigration().build();
     }
@@ -74,6 +76,7 @@ public class HomeServiceConnectionsQueueAdapter extends RecyclerView.Adapter<Hom
                 Intent intent = new Intent(context, UpdateServiceConnectionsActivity.class);
                 intent.putExtra("SCID", serviceConnections.getId());
                 intent.putExtra("USERID", userId);
+                intent.putExtra("CREW", crew);
                 context.startActivity(intent);
             }
         });
@@ -159,7 +162,7 @@ public class HomeServiceConnectionsQueueAdapter extends RecyclerView.Adapter<Hom
         protected void onPostExecute(String s) {
             holder.serviceAccountName.setText(serviceConnections.getServiceAccountName());
             holder.serviceAccountId.setText(serviceConnections.getId());
-            holder.serviceAccountAddress.setText((null==barangay ? serviceConnections.getBarangay() : barangay) + ", " + (null==town ? serviceConnections.getTown() : town));
+            holder.serviceAccountAddress.setText((serviceConnections.getSitio() != null ? serviceConnections.getSitio() + ", " : "") + (null==barangay ? serviceConnections.getBarangay() : barangay + ", ") + (null==town ? serviceConnections.getTown() : town));
 
             if (serviceConnections.getStatus().equals("Energized")) {
                 holder.serviceAccountName.setCompoundDrawablesWithIntrinsicBounds(null, null, context.getResources().getDrawable(R.drawable.ic_round_check_circle_18), null);

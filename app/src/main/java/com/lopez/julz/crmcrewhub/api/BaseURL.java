@@ -7,6 +7,6 @@ public class BaseURL {
     }
 
     public static String baseUrl(String ip) {
-        return "http://" + ip + "/crm-noneco/public/api/";
+        return "http://" + ip + "/crm-boheco1/public/api/";
     }
 }

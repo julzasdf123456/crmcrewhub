@@ -6,6 +6,18 @@
     android:layout_height="match_parent"
     tools:context=".UpdateTicketActivity">
 
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/savebtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        app:icon="@drawable/ic_baseline_save_24"
+        app:iconTint="@color/white"
+        android:text="Save"
+        android:textColor="@color/white"
+        android:layout_marginBottom="10dp"
+        android:layout_marginRight="10dp"/>
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -59,179 +71,6 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:orientation="vertical"
-                            android:layout_column="1"
-                            android:layout_weight="1">
-
-                            <com.google.android.material.card.MaterialCardView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                app:contentPadding="10dp"
-                                android:layout_margin="5dp">
-
-                                <ScrollView
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent">
-
-                                    <LinearLayout
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"
-                                        android:orientation="vertical">
-
-                                        <!-- ARRIVAL -->
-                                        <TextView
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"
-                                            android:text="Date and Time of Arrival"
-                                            android:drawableLeft="@drawable/ic_round_access_time_24"
-                                            android:drawablePadding="10dp"/>
-
-                                        <RelativeLayout
-                                            android:layout_width="match_parent"
-                                            android:layout_height="wrap_content">
-
-                                            <com.google.android.material.button.MaterialButton
-                                                android:id="@+id/markTimeOfArrivalBtn"
-                                                android:layout_width="wrap_content"
-                                                android:layout_height="wrap_content"
-                                                android:layout_alignParentLeft="true"
-                                                android:text="mark" />
-
-                                            <EditText
-                                                android:id="@+id/arrivalDateTime"
-                                                android:layout_width="match_parent"
-                                                android:layout_height="wrap_content"
-                                                android:layout_marginLeft="5dp"
-                                                android:layout_marginTop="5dp"
-                                                android:layout_marginRight="5dp"
-                                                android:layout_marginBottom="15dp"
-                                                android:layout_toRightOf="@+id/markTimeOfArrivalBtn"
-                                                android:background="@drawable/options_custom_form"
-                                                android:enabled="false"
-                                                android:hint="Time"
-                                                android:inputType="text"
-                                                android:paddingLeft="15dp"
-                                                android:paddingTop="7dp"
-                                                android:paddingRight="10dp"
-                                                android:paddingBottom="7dp" />
-
-                                        </RelativeLayout>
-
-                                        <View
-                                            android:layout_width="match_parent"
-                                            android:layout_height="1px"
-                                            android:background="@color/grey_light"
-                                            android:layout_marginTop="10dp"
-                                            android:layout_marginBottom="15dp"/>
-
-                                        <!-- ENERGIZED -->
-                                        <TextView
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"
-                                            android:text="Date and Time of Execution/Action"
-                                            android:drawableLeft="@drawable/ic_baseline_access_time_filled_24"
-                                            android:drawablePadding="10dp"/>
-
-                                        <RelativeLayout
-                                            android:layout_width="match_parent"
-                                            android:layout_height="wrap_content">
-
-                                            <com.google.android.material.button.MaterialButton
-                                                android:id="@+id/markTimeOfEnergizationBtn"
-                                                android:layout_width="wrap_content"
-                                                android:layout_height="wrap_content"
-                                                android:layout_alignParentLeft="true"
-                                                android:text="mark" />
-
-                                            <EditText
-                                                android:id="@+id/energizationDateTime"
-                                                android:layout_width="match_parent"
-                                                android:layout_height="wrap_content"
-                                                android:layout_marginLeft="5dp"
-                                                android:layout_marginTop="5dp"
-                                                android:layout_marginRight="5dp"
-                                                android:layout_marginBottom="15dp"
-                                                android:layout_toRightOf="@+id/markTimeOfEnergizationBtn"
-                                                android:background="@drawable/options_custom_form"
-                                                android:enabled="false"
-                                                android:hint="Time"
-                                                android:inputType="text"
-                                                android:paddingLeft="15dp"
-                                                android:paddingTop="7dp"
-                                                android:paddingRight="10dp"
-                                                android:paddingBottom="7dp" />
-
-                                        </RelativeLayout>
-
-                                        <View
-                                            android:layout_width="match_parent"
-                                            android:layout_height="1px"
-                                            android:background="@color/grey_light"
-                                            android:layout_marginTop="10dp"
-                                            android:layout_marginBottom="15dp"/>
-
-                                        <!-- ASSESSMENT -->
-                                        <TextView
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"
-                                            android:text="Assessment"
-                                            android:drawableLeft="@drawable/ic_round_library_add_check_24"
-                                            android:drawablePadding="10dp"/>
-
-                                        <RadioGroup
-                                            android:id="@+id/assessment"
-                                            android:layout_width="match_parent"
-                                            android:layout_height="wrap_content"
-                                            android:orientation="horizontal">
-
-                                            <RadioButton
-                                                android:id="@+id/opsExecuted"
-                                                android:layout_width="wrap_content"
-                                                android:layout_height="wrap_content"
-                                                android:text="Executed"
-                                                android:layout_marginRight="15dp"
-                                                android:layout_marginLeft="15dp"/>
-
-                                            <RadioButton
-                                                android:id="@+id/opsNotExecuted"
-                                                android:layout_width="wrap_content"
-                                                android:layout_height="wrap_content"
-                                                android:text="Not Executed"
-                                                android:layout_marginRight="15dp"
-                                                android:layout_marginLeft="15dp"
-                                                android:paddingBottom="5dp"/>
-
-                                        </RadioGroup>
-
-                                        <EditText
-                                            android:id="@+id/remarks"
-                                            android:layout_width="match_parent"
-                                            android:layout_height="wrap_content"
-                                            android:hint="Remarks and Notes"
-                                            android:inputType="text|textMultiLine"
-                                            android:layout_marginBottom="15dp"
-                                            android:background="@drawable/options_custom_form"
-                                            android:paddingTop="7dp"
-                                            android:paddingBottom="7dp"
-                                            android:paddingLeft="15dp"
-                                            android:paddingRight="10dp"
-                                            android:layout_toRightOf="@+id/markTimeOfEnergizationBtn"
-                                            android:layout_marginTop="5dp"
-                                            android:layout_marginLeft="5dp"
-                                            android:layout_marginRight="5dp"
-                                            android:lines="3"
-                                            android:gravity="left|top"/>
-
-                                    </LinearLayout>
-
-                                </ScrollView>
-
-                            </com.google.android.material.card.MaterialCardView>
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="vertical"
                             android:layout_column="2"
                             android:layout_weight="2">
 
@@ -251,6 +90,8 @@
                                         android:layout_height="wrap_content"
                                         android:text="Ticket Details"
                                         android:drawableLeft="@drawable/ic_baseline_assignment_24"
+                                        android:drawableTint="@color/primary_500"
+                                        android:textColor="@color/primary_500"
                                         android:drawablePadding="10dp"/>
 
                                     <View
@@ -263,6 +104,7 @@
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
+                                        android:textSize="7pt"
                                         android:text="Ticket Type"/>
 
                                     <TextView
@@ -277,6 +119,7 @@
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
+                                        android:textSize="7pt"
                                         android:text="Reason"/>
 
                                     <TextView
@@ -291,6 +134,7 @@
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
+                                        android:textSize="7pt"
                                         android:text="Account Number"/>
 
                                     <TextView
@@ -305,6 +149,7 @@
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
+                                        android:textSize="7pt"
                                         android:text="Address"/>
 
                                     <TextView
@@ -319,6 +164,22 @@
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
+                                        android:textSize="7pt"
+                                        android:text="Pole Number"/>
+
+                                    <TextView
+                                        android:id="@+id/poleNumber"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="@color/black"
+                                        android:background="@drawable/options_custom_form"
+                                        android:padding="8dp"
+                                        android:layout_marginBottom="10dp"/>
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="7pt"
                                         android:text="Contact Number"/>
 
                                     <TextView
@@ -330,9 +191,291 @@
                                         android:padding="8dp"
                                         android:layout_marginBottom="10dp"/>
 
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="7pt"
+                                        android:text="Coordinates"/>
+
+                                    <EditText
+                                        android:id="@+id/coordinates"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="@color/black"
+                                        android:background="@drawable/options_custom_form"
+                                        android:padding="8dp"
+                                        android:layout_marginBottom="10dp"/>
+
                                 </LinearLayout>
                             </com.google.android.material.card.MaterialCardView>
 
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical"
+                            android:layout_column="1"
+                            android:layout_weight="1">
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                app:contentPadding="10dp"
+                                app:cardBackgroundColor="@color/primary_500"
+                                android:layout_margin="5dp">
+
+                                <ScrollView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent">
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:orientation="vertical">
+
+                                        <!-- ARRIVAL -->
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="Date and Time of Arrival"
+                                            android:textColor="@color/white"
+                                            android:drawableLeft="@drawable/ic_round_access_time_24"
+                                            android:drawableTint="@color/white"
+                                            android:drawablePadding="10dp"/>
+
+                                        <RelativeLayout
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content">
+
+                                            <com.google.android.material.button.MaterialButton
+                                                android:id="@+id/markTimeOfArrivalBtn"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:layout_alignParentLeft="true"
+                                                app:backgroundTint="@color/white"
+                                                android:textColor="@color/primary_500"
+                                                android:text="mark" />
+
+                                            <EditText
+                                                android:id="@+id/arrivalDateTime"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginLeft="5dp"
+                                                android:layout_marginTop="5dp"
+                                                android:layout_marginRight="5dp"
+                                                android:layout_marginBottom="15dp"
+                                                android:layout_toLeftOf="@id/editTimeOfArrivalBtn"
+                                                android:layout_toRightOf="@+id/markTimeOfArrivalBtn"
+                                                android:background="@drawable/options_custom_form"
+                                                android:enabled="false"
+                                                android:hint="Time"
+                                                android:inputType="text"
+                                                android:paddingLeft="15dp"
+                                                android:textColor="@color/white"
+                                                android:textColorHint="@color/grey_light"
+                                                android:paddingTop="7dp"
+                                                android:paddingRight="10dp"
+                                                android:paddingBottom="7dp" />
+
+                                            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                                                android:id="@+id/editTimeOfArrivalBtn"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:layout_alignParentRight="true"
+                                                app:backgroundTint="@color/white"
+                                                android:textColor="@color/primary_500"
+                                                app:fabSize="mini"
+                                                android:src="@drawable/ic_baseline_update_24"
+                                                app:tint="@color/primary_500"/>
+
+                                        </RelativeLayout>
+
+                                        <View
+                                            android:layout_width="match_parent"
+                                            android:layout_height="1px"
+                                            android:background="@color/grey_light"
+                                            android:layout_marginTop="10dp"
+                                            android:layout_marginBottom="15dp"/>
+
+                                        <!-- ENERGIZED -->
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="Date and Time of Execution/Action"
+                                            android:drawableLeft="@drawable/ic_baseline_access_time_filled_24"
+                                            android:drawableTint="@color/white"
+                                            android:textColor="@color/white"
+                                            android:drawablePadding="10dp"/>
+
+                                        <RelativeLayout
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content">
+
+                                            <com.google.android.material.button.MaterialButton
+                                                android:id="@+id/markTimeOfEnergizationBtn"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:layout_alignParentLeft="true"
+                                                app:backgroundTint="@color/white"
+                                                android:textColor="@color/primary_500"
+                                                android:text="mark" />
+
+                                            <EditText
+                                                android:id="@+id/energizationDateTime"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginLeft="5dp"
+                                                android:layout_marginTop="5dp"
+                                                android:layout_marginRight="5dp"
+                                                android:layout_marginBottom="15dp"
+                                                android:layout_toLeftOf="@id/editTimeOfEnergizationBtn"
+                                                android:layout_toRightOf="@+id/markTimeOfEnergizationBtn"
+                                                android:background="@drawable/options_custom_form"
+                                                android:enabled="false"
+                                                android:textColorHint="@color/grey_light"
+                                                android:textColor="@color/white"
+                                                android:hint="Time"
+                                                android:inputType="text"
+                                                android:paddingLeft="15dp"
+                                                android:paddingTop="7dp"
+                                                android:paddingRight="10dp"
+                                                android:paddingBottom="7dp" />
+
+                                            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                                                android:id="@+id/editTimeOfEnergizationBtn"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:layout_alignParentRight="true"
+                                                app:backgroundTint="@color/white"
+                                                android:textColor="@color/primary_500"
+                                                app:fabSize="mini"
+                                                android:src="@drawable/ic_baseline_update_24"
+                                                app:tint="@color/primary_500"/>
+
+                                        </RelativeLayout>
+
+                                        <View
+                                            android:layout_width="match_parent"
+                                            android:layout_height="1px"
+                                            android:background="@color/grey_light"
+                                            android:layout_marginTop="10dp"
+                                            android:layout_marginBottom="15dp"/>
+
+                                        <!-- ASSESSMENT -->
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="Assessment"
+                                            android:textColor="@color/white"
+                                            android:drawableTint="@color/white"
+                                            android:drawableLeft="@drawable/ic_round_library_add_check_24"
+                                            android:drawablePadding="10dp"/>
+
+                                        <RadioGroup
+                                            android:id="@+id/assessment"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:orientation="vertical">
+
+                                            <RadioButton
+                                                android:id="@+id/opsExecuted"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:text="Executed"
+                                                android:textColor="@color/white"
+                                                android:layout_marginRight="15dp"
+                                                android:layout_marginLeft="15dp"/>
+
+                                            <RadioButton
+                                                android:id="@+id/opsNotExecuted"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:text="Not Executed"
+                                                android:layout_marginRight="15dp"
+                                                android:textColor="@color/white"
+                                                android:layout_marginLeft="15dp"
+                                                android:paddingBottom="5dp"/>
+
+                                            <RadioButton
+                                                android:id="@+id/opsActed"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:text="Acted"
+                                                android:layout_marginRight="15dp"
+                                                android:textColor="@color/white"
+                                                android:layout_marginLeft="15dp"
+                                                android:paddingBottom="5dp"/>
+
+                                        </RadioGroup>
+
+                                        <!-- CREW -->
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="Crew/Lineman Executed"
+                                            android:textColor="@color/white"
+                                            android:drawableTint="@color/white"
+                                            android:drawableLeft="@drawable/ic_baseline_hardware_24"
+                                            android:drawablePadding="10dp"/>
+
+                                        <EditText
+                                            android:id="@+id/crewExecuted"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:hint="Name of Lineman/Crew"
+                                            android:inputType="text"
+                                            android:layout_marginBottom="15dp"
+                                            android:background="@drawable/options_custom_form"
+                                            android:paddingTop="7dp"
+                                            android:paddingBottom="7dp"
+                                            android:paddingLeft="15dp"
+                                            android:paddingRight="10dp"
+                                            android:textColorHint="@color/grey_light"
+                                            android:textColor="@color/white"
+                                            android:layout_toRightOf="@+id/markTimeOfEnergizationBtn"
+                                            android:layout_marginTop="5dp"
+                                            android:layout_marginLeft="5dp"
+                                            android:layout_marginRight="5dp"
+                                            android:lines="3"
+                                            android:gravity="left|top"/>
+
+                                        <!-- REMARKS -->
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="Remarks/Notes"
+                                            android:textColor="@color/white"
+                                            android:drawableTint="@color/white"
+                                            android:drawableLeft="@drawable/ic_baseline_comment_24"
+                                            android:drawablePadding="10dp"/>
+
+                                        <EditText
+                                            android:id="@+id/remarks"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:hint="Remarks and Notes"
+                                            android:inputType="text|textMultiLine"
+                                            android:layout_marginBottom="15dp"
+                                            android:background="@drawable/options_custom_form"
+                                            android:paddingTop="7dp"
+                                            android:paddingBottom="7dp"
+                                            android:paddingLeft="15dp"
+                                            android:paddingRight="10dp"
+                                            android:textColorHint="@color/grey_light"
+                                            android:textColor="@color/white"
+                                            android:layout_toRightOf="@+id/markTimeOfEnergizationBtn"
+                                            android:layout_marginTop="5dp"
+                                            android:layout_marginLeft="5dp"
+                                            android:layout_marginRight="5dp"
+                                            android:lines="3"
+                                            android:gravity="left|top"/>
+
+                                    </LinearLayout>
+
+                                </ScrollView>
+
+                            </com.google.android.material.card.MaterialCardView>
                         </LinearLayout>
 
                     </TableRow>
@@ -354,6 +497,8 @@
                             android:layout_height="wrap_content"
                             android:text="Change Meter Area"
                             android:drawableLeft="@drawable/ic_baseline_av_timer_24"
+                            android:drawableTint="@color/primary_500"
+                            android:textColor="@color/primary_500"
                             android:drawablePadding="10dp"/>
 
                         <View
@@ -399,6 +544,7 @@
                                             <TextView
                                                 android:layout_width="wrap_content"
                                                 android:layout_height="wrap_content"
+                                                android:textSize="7pt"
                                                 android:text="Old Meter Number"/>
 
                                             <TextView
@@ -413,6 +559,7 @@
                                             <TextView
                                                 android:layout_width="wrap_content"
                                                 android:layout_height="wrap_content"
+                                                android:textSize="7pt"
                                                 android:text="Old Meter Brand"/>
 
                                             <TextView
@@ -427,6 +574,7 @@
                                             <TextView
                                                 android:layout_width="wrap_content"
                                                 android:layout_height="wrap_content"
+                                                android:textSize="7pt"
                                                 android:text="Old Meter Last Reading"/>
 
                                             <EditText
@@ -464,6 +612,7 @@
                                             <TextView
                                                 android:layout_width="wrap_content"
                                                 android:layout_height="wrap_content"
+                                                android:textSize="7pt"
                                                 android:text="New Meter Number"/>
 
                                             <EditText
@@ -479,6 +628,7 @@
                                             <TextView
                                                 android:layout_width="wrap_content"
                                                 android:layout_height="wrap_content"
+                                                android:textSize="7pt"
                                                 android:text="New Meter Brand"/>
 
                                             <EditText
@@ -494,6 +644,7 @@
                                             <TextView
                                                 android:layout_width="wrap_content"
                                                 android:layout_height="wrap_content"
+                                                android:textSize="7pt"
                                                 android:text="New Meter Last Reading"/>
 
                                             <EditText

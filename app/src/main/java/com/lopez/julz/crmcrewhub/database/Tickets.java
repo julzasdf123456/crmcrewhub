@@ -114,10 +114,16 @@ public class Tickets {
     @ColumnInfo(name = "UploadStatus")
     private String UploadStatus;
 
+    @ColumnInfo(name = "PoleNumber")
+    private String PoleNumber;
+
+    @ColumnInfo(name = "LinemanCrewExecuted")
+    private String LinemanCrewExecuted;
+
     public Tickets() {
     }
 
-    public Tickets(@NonNull String id, String accountNumber, String consumerName, String town, String barangay, String sitio, String ticket, String reason, String contactNumber, String reportedBy, String ORNumber, String ORDate, String geoLocation, String neighbor1, String neighbor2, String notes, String status, String dateTimeDownloaded, String dateTimeLinemanArrived, String dateTimeLinemanExecuted, String userId, String crewAssigned, String created_at, String updated_at, String trash, String office, String currentMeterNo, String currentMeterBrand, String currentMeterReading, String kwhRating, String percentError, String newMeterNo, String newMeterBrand, String newMeterReading, String uploadStatus) {
+    public Tickets(@NonNull String id, String accountNumber, String consumerName, String town, String barangay, String sitio, String ticket, String reason, String contactNumber, String reportedBy, String ORNumber, String ORDate, String geoLocation, String neighbor1, String neighbor2, String notes, String status, String dateTimeDownloaded, String dateTimeLinemanArrived, String dateTimeLinemanExecuted, String userId, String crewAssigned, String created_at, String updated_at, String trash, String office, String currentMeterNo, String currentMeterBrand, String currentMeterReading, String kwhRating, String percentError, String newMeterNo, String newMeterBrand, String newMeterReading, String uploadStatus, String poleNumber, String linemanCrewExecuted) {
         this.id = id;
         AccountNumber = accountNumber;
         ConsumerName = consumerName;
@@ -153,6 +159,8 @@ public class Tickets {
         NewMeterBrand = newMeterBrand;
         NewMeterReading = newMeterReading;
         UploadStatus = uploadStatus;
+        PoleNumber = poleNumber;
+        LinemanCrewExecuted = linemanCrewExecuted;
     }
 
     @NonNull
@@ -434,5 +442,21 @@ public class Tickets {
 
     public void setUploadStatus(String uploadStatus) {
         UploadStatus = uploadStatus;
+    }
+
+    public String getPoleNumber() {
+        return PoleNumber;
+    }
+
+    public void setPoleNumber(String poleNumber) {
+        PoleNumber = poleNumber;
+    }
+
+    public String getLinemanCrewExecuted() {
+        return LinemanCrewExecuted;
+    }
+
+    public void setLinemanCrewExecuted(String linemanCrewExecuted) {
+        LinemanCrewExecuted = linemanCrewExecuted;
     }
 }

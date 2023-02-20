@@ -1,12 +1,15 @@
 package com.lopez.julz.crmcrewhub.classes;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+
+import androidx.core.app.ActivityCompat;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -38,6 +41,17 @@ public class ObjectHelpers {
         }
     }
 
+    public static String getDateFromDatePicker(String date) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-M-dd");
+            Date d = sdf.parse(date);
+            sdf = new SimpleDateFormat("yyyy-MM-dd");
+            return sdf.format(d);
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
     public static String getTimeInMillis() {
         try {
             return new Date().getTime() + "";
@@ -55,5 +69,16 @@ public class ObjectHelpers {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public static boolean hasPermissions(Context context, String... permissions) {
+        if (context != null && permissions != null) {
+            for (String permission : permissions) {
+                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }

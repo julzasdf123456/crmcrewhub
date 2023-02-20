@@ -29,6 +29,9 @@ public class Crew {
     @ColumnInfo(name = "updated_at")
     private String updated_at;
 
+    @ColumnInfo(name = "IsActive")
+    private String IsActive;
+
     public Crew() {
     }
 
@@ -40,6 +43,17 @@ public class Crew {
         Notes = notes;
         this.created_at = created_at;
         this.updated_at = updated_at;
+    }
+
+    public Crew(@NonNull String id, String stationName, String crewLeader, String members, String notes, String created_at, String updated_at, String isActive) {
+        this.id = id;
+        StationName = stationName;
+        CrewLeader = crewLeader;
+        Members = members;
+        Notes = notes;
+        this.created_at = created_at;
+        this.updated_at = updated_at;
+        IsActive = isActive;
     }
 
     @NonNull
@@ -97,5 +111,13 @@ public class Crew {
 
     public void setUpdated_at(String updated_at) {
         this.updated_at = updated_at;
+    }
+
+    public String getIsActive() {
+        return IsActive;
+    }
+
+    public void setIsActive(String isActive) {
+        IsActive = isActive;
     }
 }
