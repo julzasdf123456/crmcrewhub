@@ -96,6 +96,9 @@ public class Tickets {
     @ColumnInfo(name = "CurrentMeterReading")
     private String CurrentMeterReading;
 
+    @ColumnInfo(name = "CurrentMeterSeal")
+    private String CurrentMeterSeal;
+
     @ColumnInfo(name = "KwhRating")
     private String KwhRating;
 
@@ -111,6 +114,9 @@ public class Tickets {
     @ColumnInfo(name = "NewMeterReading")
     private String NewMeterReading;
 
+    @ColumnInfo(name = "NewMeterSeal")
+    private String NewMeterSeal;
+
     @ColumnInfo(name = "UploadStatus")
     private String UploadStatus;
 
@@ -120,10 +126,12 @@ public class Tickets {
     @ColumnInfo(name = "LinemanCrewExecuted")
     private String LinemanCrewExecuted;
 
+
+
     public Tickets() {
     }
 
-    public Tickets(@NonNull String id, String accountNumber, String consumerName, String town, String barangay, String sitio, String ticket, String reason, String contactNumber, String reportedBy, String ORNumber, String ORDate, String geoLocation, String neighbor1, String neighbor2, String notes, String status, String dateTimeDownloaded, String dateTimeLinemanArrived, String dateTimeLinemanExecuted, String userId, String crewAssigned, String created_at, String updated_at, String trash, String office, String currentMeterNo, String currentMeterBrand, String currentMeterReading, String kwhRating, String percentError, String newMeterNo, String newMeterBrand, String newMeterReading, String uploadStatus, String poleNumber, String linemanCrewExecuted) {
+    public Tickets(@NonNull String id, String accountNumber, String consumerName, String town, String barangay, String sitio, String ticket, String reason, String contactNumber, String reportedBy, String ORNumber, String ORDate, String geoLocation, String neighbor1, String neighbor2, String notes, String status, String dateTimeDownloaded, String dateTimeLinemanArrived, String dateTimeLinemanExecuted, String userId, String crewAssigned, String created_at, String updated_at, String trash, String office, String currentMeterNo, String currentMeterBrand, String currentMeterReading, String currentMeterSeal, String kwhRating, String percentError, String newMeterNo, String newMeterBrand, String newMeterReading, String newMeterSeal, String uploadStatus, String poleNumber, String linemanCrewExecuted) {
         this.id = id;
         AccountNumber = accountNumber;
         ConsumerName = consumerName;
@@ -153,11 +161,13 @@ public class Tickets {
         CurrentMeterNo = currentMeterNo;
         CurrentMeterBrand = currentMeterBrand;
         CurrentMeterReading = currentMeterReading;
+        CurrentMeterSeal = currentMeterSeal;
         KwhRating = kwhRating;
         PercentError = percentError;
         NewMeterNo = newMeterNo;
         NewMeterBrand = newMeterBrand;
         NewMeterReading = newMeterReading;
+        NewMeterSeal = newMeterSeal;
         UploadStatus = uploadStatus;
         PoleNumber = poleNumber;
         LinemanCrewExecuted = linemanCrewExecuted;
@@ -458,5 +468,21 @@ public class Tickets {
 
     public void setLinemanCrewExecuted(String linemanCrewExecuted) {
         LinemanCrewExecuted = linemanCrewExecuted;
+    }
+
+    public String getCurrentMeterSeal() {
+        return CurrentMeterSeal;
+    }
+
+    public void setCurrentMeterSeal(String currentMeterSeal) {
+        CurrentMeterSeal = currentMeterSeal;
+    }
+
+    public String getNewMeterSeal() {
+        return NewMeterSeal;
+    }
+
+    public void setNewMeterSeal(String newMeterSeal) {
+        NewMeterSeal = newMeterSeal;
     }
 }

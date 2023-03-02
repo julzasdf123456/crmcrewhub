@@ -77,11 +77,13 @@ public class ConnectionSettingsActivity extends AppCompatActivity {
 //            servers.add("192.168.110.94");
 //            servers.add("192.168.5.5");
 //            servers.add("203.177.135.179:8443");
+
+            servers.add("192.168.10.15");
+            servers.add("192.168.30.143");
+            servers.add("192.168.11.45");
+            servers.add("192.168.33.241");
+            servers.add("192.168.32.18");
             servers.add("192.168.10.161");
-            servers.add("192.168.2.12");
-            servers.add("192.168.130.186");
-            servers.add("192.168.100.2");
-            servers.add("192.168.10.200");
             ArrayAdapter serversAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, servers.toArray());
             serversAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             serverSelect.setAdapter(serversAdapter);

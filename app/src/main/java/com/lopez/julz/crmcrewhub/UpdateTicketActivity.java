@@ -10,9 +10,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,6 +26,8 @@ import com.lopez.julz.crmcrewhub.database.AppDatabase;
 import com.lopez.julz.crmcrewhub.database.BarangaysDao;
 import com.lopez.julz.crmcrewhub.database.Crew;
 import com.lopez.julz.crmcrewhub.database.CrewDao;
+import com.lopez.julz.crmcrewhub.database.StationCrews;
+import com.lopez.julz.crmcrewhub.database.StationCrewsDao;
 import com.lopez.julz.crmcrewhub.database.TicketRepositories;
 import com.lopez.julz.crmcrewhub.database.TicketRepositoriesDao;
 import com.lopez.julz.crmcrewhub.database.Tickets;
@@ -32,7 +36,9 @@ import com.lopez.julz.crmcrewhub.database.TownsDao;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class UpdateTicketActivity extends AppCompatActivity {
 
@@ -43,18 +49,21 @@ public class UpdateTicketActivity extends AppCompatActivity {
 
     public Tickets ticket;
 
-    public TextView accountName, ticketNo, ticketType, reason, address, contact, acctNo, poleNumber;
+    public TextView accountName, ticketNo, ticketType, reason, address, contact, acctNo, poleNumber, entry;
 
     public MaterialButton markTimeOfArrivalBtn, markTimeOfEnergizationBtn;
-    public EditText arrivalDateTime, energizationDateTime, remarks, coordinates, crewExecuted;
+    public EditText arrivalDateTime, energizationDateTime, remarks, coordinates;
     public RadioGroup assessment;
     public RadioButton forAveraging;
     public FloatingActionButton editTimeOfArrivalBtn, editTimeOfEnergizationBtn;
 
-    public TextView oldMeterSerial, oldMeterBrand;
-    public EditText oldMeterReading, newMeterSerial, newMeterBrand, newMeterReading;
+    public EditText oldMeterSerial, oldMeterBrand;
+    public EditText oldMeterReading, newMeterSerial, newMeterBrand, newMeterReading, oldSeal, newSeal;
+    public Spinner crewExecuted;
 
     private String crew;
+
+    ArrayAdapter crewAdapter;
 
     private ExtendedFloatingActionButton savebtn;
 
@@ -101,8 +110,11 @@ public class UpdateTicketActivity extends AppCompatActivity {
         editTimeOfEnergizationBtn = findViewById(R.id.editTimeOfEnergizationBtn);
         crewExecuted = findViewById(R.id.crewExecuted);
         savebtn = findViewById(R.id.savebtn);
+        oldSeal = findViewById(R.id.oldSeal);
+        newSeal = findViewById(R.id.newSeal);
+        entry = findViewById(R.id.entry);
 
-        new GetTicketDetails().execute();
+        new GetCrews().execute();
 
         markTimeOfEnergizationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -134,12 +146,16 @@ public class UpdateTicketActivity extends AppCompatActivity {
                     ticket.setPercentError("FOR AVERAGING");
                 }
 
+                ticket.setCurrentMeterBrand(oldMeterBrand.getText().toString());
+                ticket.setCurrentMeterNo(oldMeterSerial.getText().toString());
                 ticket.setCurrentMeterReading(oldMeterReading.getText().toString());
                 ticket.setNewMeterBrand(newMeterBrand.getText().toString());
                 ticket.setNewMeterNo(newMeterSerial.getText().toString());
                 ticket.setNewMeterReading(newMeterReading.getText().toString());
                 ticket.setGeoLocation(coordinates.getText().toString());
-                ticket.setLinemanCrewExecuted(crewExecuted.getText().toString());
+                ticket.setLinemanCrewExecuted(crewExecuted.getSelectedItem().toString());
+                ticket.setCurrentMeterSeal(oldSeal.getText().toString());
+                ticket.setNewMeterSeal(newSeal.getText().toString());
                 new UpdateTicket().execute(ticket);
                 finish();
             }
@@ -262,12 +278,16 @@ public class UpdateTicketActivity extends AppCompatActivity {
                 ticket.setPercentError("FOR AVERAGING");
             }
 
+            ticket.setCurrentMeterBrand(oldMeterBrand.getText().toString());
+            ticket.setCurrentMeterNo(oldMeterSerial.getText().toString());
             ticket.setCurrentMeterReading(oldMeterReading.getText().toString());
             ticket.setNewMeterBrand(newMeterBrand.getText().toString());
             ticket.setNewMeterNo(newMeterSerial.getText().toString());
             ticket.setNewMeterReading(newMeterReading.getText().toString());
             ticket.setGeoLocation(coordinates.getText().toString());
-            ticket.setLinemanCrewExecuted(crewExecuted.getText().toString());
+            ticket.setLinemanCrewExecuted(crewExecuted.getSelectedItem().toString());
+            ticket.setCurrentMeterSeal(oldSeal.getText().toString());
+            ticket.setNewMeterSeal(newSeal.getText().toString());
             new UpdateTicket().execute(ticket);
             finish();
         }
@@ -346,10 +366,15 @@ public class UpdateTicketActivity extends AppCompatActivity {
                 remarks.setText(ticket.getNotes());
                 coordinates.setText(ticket.getGeoLocation());
                 poleNumber.setText(ticket.getPoleNumber());
+                oldSeal.setText(ticket.getCurrentMeterSeal());
+                newSeal.setText(ticket.getNewMeterSeal());
+                String entryDate = ticket.getCreated_at() != null ? ticket.getCreated_at() : "";
+                entry.setText(entryDate.equals("") ? "-" : entryDate.substring(0,10));
                 if (ticket.getLinemanCrewExecuted() != null) {
-                    crewExecuted.setText(ticket.getLinemanCrewExecuted());
+                    crewExecuted.setSelection(crewAdapter.getPosition(ticket.getLinemanCrewExecuted()));
                 } else {
-                    crewExecuted.setText(loggedcrew);
+//                    crewExecuted.setText(loggedcrew);
+                    crewExecuted.setSelection(crewAdapter.getPosition(loggedcrew));
                 }
 
                 if (ticket.getStatus() != null) {
@@ -382,6 +407,46 @@ public class UpdateTicketActivity extends AppCompatActivity {
             }
         } else {
             return 0;
+        }
+    }
+
+    public class GetCrews extends AsyncTask<String, Void, Void> {
+
+        public List<StationCrews> stationCrewsList;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            stationCrewsList = new ArrayList<>();
+        }
+
+        @Override
+        protected Void doInBackground(String... strings) {
+            try {
+                stationCrewsList.addAll(db.stationCrewsDao().getAll());
+            } catch (Exception e) {
+                Log.e("ERR_GET_CREWS", e.getMessage());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void unused) {
+            super.onPostExecute(unused);
+
+            try {
+                List<String> crews = new ArrayList<>();
+                for(int i=0; i<stationCrewsList.size(); i++) {
+                    crews.add(stationCrewsList.get(i).getStationName());
+                }
+
+                crewAdapter = new ArrayAdapter(UpdateTicketActivity.this, R.layout.spinner_item, crews.toArray());
+                crewAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                crewExecuted.setAdapter(crewAdapter);
+                new GetTicketDetails().execute();
+            } catch (Exception e) {
+                Log.e("ERR_DSP_CREWS", e.getMessage());
+            }
         }
     }
 }

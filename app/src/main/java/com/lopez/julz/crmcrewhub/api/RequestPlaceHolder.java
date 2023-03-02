@@ -6,6 +6,8 @@ import com.lopez.julz.crmcrewhub.classes.Towns;
 import com.lopez.julz.crmcrewhub.database.Crew;
 import com.lopez.julz.crmcrewhub.database.ServiceConnectionInspections;
 import com.lopez.julz.crmcrewhub.database.ServiceConnections;
+import com.lopez.julz.crmcrewhub.database.StationCrews;
+import com.lopez.julz.crmcrewhub.database.StationCrewsDao;
 import com.lopez.julz.crmcrewhub.database.TicketRepositories;
 import com.lopez.julz.crmcrewhub.database.Tickets;
 import com.lopez.julz.crmcrewhub.database.TimeFrames;
@@ -69,4 +71,10 @@ public interface RequestPlaceHolder {
 
     @POST("upload-tickets")
     Call<Tickets> uploadTickets(@Body Tickets tickets);
+
+    @GET("get-crews-from-station")
+    Call<List<StationCrews>> getCrewsFromStation(@Query("CrewLeader") String CrewLeader);
+
+    @GET("get-archive-tickets")
+    Call<List<Tickets>> getArchiveTickets(@Query("CrewAssigned") String CrewAssigned);
 }

@@ -25,6 +25,20 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CRMCrewHub">
         <activity
+            android:name=".ArchiveViewActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".ArchiveActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".ConnectionSettingsActivity"
             android:exported="true" />
         <activity

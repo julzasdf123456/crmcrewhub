@@ -404,26 +404,19 @@
                                             android:drawableLeft="@drawable/ic_baseline_hardware_24"
                                             android:drawablePadding="10dp"/>
 
-                                        <EditText
-                                            android:id="@+id/crewExecuted"
-                                            android:layout_width="match_parent"
-                                            android:layout_height="wrap_content"
-                                            android:hint="Name of Lineman/Crew"
-                                            android:inputType="text"
-                                            android:layout_marginBottom="15dp"
+                                        <RelativeLayout
                                             android:background="@drawable/options_custom_form"
-                                            android:paddingTop="7dp"
-                                            android:paddingBottom="7dp"
-                                            android:paddingLeft="15dp"
-                                            android:paddingRight="10dp"
-                                            android:textColorHint="@color/grey_light"
-                                            android:textColor="@color/white"
-                                            android:layout_toRightOf="@+id/markTimeOfEnergizationBtn"
-                                            android:layout_marginTop="5dp"
-                                            android:layout_marginLeft="5dp"
-                                            android:layout_marginRight="5dp"
-                                            android:lines="3"
-                                            android:gravity="left|top"/>
+                                            android:layout_width="match_parent"
+                                            android:paddingTop="10dp"
+                                            android:paddingBottom="10dp"
+                                            android:layout_marginTop="10dp"
+                                            android:layout_marginBottom="10dp"
+                                            android:layout_height="wrap_content">
+                                            <Spinner
+                                                android:id="@+id/crewExecuted"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"></Spinner>
+                                        </RelativeLayout>
 
                                         <!-- REMARKS -->
                                         <TextView

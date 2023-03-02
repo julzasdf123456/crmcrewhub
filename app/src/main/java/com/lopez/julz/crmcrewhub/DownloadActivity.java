@@ -352,7 +352,7 @@ public class DownloadActivity extends AppCompatActivity {
                     int size = tickets.size();
 
                     for (int i=0; i<size; i++) {
-                        Tickets dbTicket = ticketsDao.getOne(tickets.get(i).getId());
+                        Tickets dbTicket = ticketsDao.getOneValidation(tickets.get(i).getId());
 
                         if (dbTicket != null) {
                             // skip
@@ -384,7 +384,14 @@ public class DownloadActivity extends AppCompatActivity {
                 int size = ticketsList.size();
 
                 for (int i=0; i<size; i++) {
-                    ticketsDao.insertAll(ticketsList.get(i));
+                    Tickets ticket = ticketsDao.getOne(ticketsList.get(i).getId());
+
+                    if (ticket != null) {
+                        ticket.setUploadStatus(null);
+                        ticketsDao.updateAll(ticket);
+                    } else {
+                        ticketsDao.insertAll(ticketsList.get(i));
+                    }
                 }
             } catch (Exception e) {
                 Log.e("ERR_SAVE_TICKETS", e.getMessage());

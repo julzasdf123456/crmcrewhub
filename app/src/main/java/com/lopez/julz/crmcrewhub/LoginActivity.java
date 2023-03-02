@@ -39,6 +39,8 @@ import com.lopez.julz.crmcrewhub.database.AppDatabase;
 import com.lopez.julz.crmcrewhub.database.Crew;
 import com.lopez.julz.crmcrewhub.database.CrewDao;
 import com.lopez.julz.crmcrewhub.database.Settings;
+import com.lopez.julz.crmcrewhub.database.StationCrews;
+import com.lopez.julz.crmcrewhub.database.StationCrewsDao;
 import com.lopez.julz.crmcrewhub.database.Users;
 import com.lopez.julz.crmcrewhub.database.UsersDao;
 
@@ -65,7 +67,7 @@ public class LoginActivity extends AppCompatActivity {
 
     public Settings settings;
 
-    private String CREW = null;
+    private String CREW = null, STATION = null;
 
     private static final int WIFI_PERMISSION = 100;
     private static final int STORAGE_PERMISSION_READ = 101;
@@ -299,6 +301,30 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    public void getStationCrews(String station) {
+        try {
+            Call<List<StationCrews>> listCall = requestPlaceHolder.getCrewsFromStation(station);
+
+            listCall.enqueue(new Callback<List<StationCrews>>() {
+                @Override
+                public void onResponse(Call<List<StationCrews>> call, Response<List<StationCrews>> response) {
+                    if(response.isSuccessful()) {
+                        new SaveCrewFromStations().execute(response.body());
+                    } else {
+                        Log.e("ERR_GET_ST_CRW", response.message() + " , " + response.raw());
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<List<StationCrews>> call, Throwable t) {
+                    Log.e("ERR_GET_ST_CRW", t.getMessage());
+                }
+            });
+        } catch (Exception e) {
+            Log.e("ERR_GET_ST_CRW", e.getMessage());
+        }
+    }
+
     public class SaveCrew extends AsyncTask<List<Crew>, Void, Void> {
 
         @Override
@@ -332,6 +358,39 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    public class SaveCrewFromStations extends AsyncTask<List<StationCrews>, Void, Void> {
+
+        @Override
+        protected Void doInBackground(List<StationCrews>... lists) {
+            try {
+                StationCrewsDao stationCrewsDao = db.stationCrewsDao();
+
+                if (lists != null) {
+                    List<StationCrews> crewList = lists[0];
+
+                    for (int i=0; i<crewList.size(); i++) {
+                        StationCrews crew = stationCrewsDao.getOne(crewList.get(i).getId());
+
+                        if (crew != null) {
+                            // skip
+                        } else {
+                            stationCrewsDao.insertAll(crewList.get(i));
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                Log.e("ERR_SV_CREW", e.getMessage());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void unused) {
+            super.onPostExecute(unused);
+            Log.e("ALL_CREW_ST_DWNLD", "All crew stations downloaded");
+        }
+    }
+
     /**
      * FETCH APP CONFIG
      */
@@ -345,6 +404,7 @@ public class LoginActivity extends AppCompatActivity {
                 AppConfig appConfig = appConfigDao.getConfig();
 
                 CREW = appConfig.getDeviceStation();
+                STATION = appConfig.getCrewLeader();
             } catch (Exception e) {
                 Log.e("ERR_GET_CONFIG", e.getMessage());
             }
@@ -357,6 +417,8 @@ public class LoginActivity extends AppCompatActivity {
             if (CREW != null) {
                 loginBtn.setEnabled(true);
                 configErrorMessage.setVisibility(View.GONE);
+
+                getStationCrews(STATION);
             } else {
                 loginBtn.setEnabled(false);
                 configErrorMessage.setVisibility(View.VISIBLE);

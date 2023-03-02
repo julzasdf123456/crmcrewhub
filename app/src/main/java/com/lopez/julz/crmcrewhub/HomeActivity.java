@@ -244,6 +244,16 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
                 selectTab(ticketsQueueTitle, scQueueTitle, recyclerviewTicketsHome, recyclerviewScHome);
             }
         });
+
+        archive.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(HomeActivity.this, ArchiveActivity.class);
+                intent.putExtra("CREW", crew);
+                intent.putExtra("USERID", userId);
+                startActivity(intent);
+            }
+        });
     }
 
     public void selectTab(@NonNull TextView active, TextView previous, View showView, View hideView) {
@@ -1040,9 +1050,62 @@ public class HomeActivity extends AppCompatActivity implements PermissionsListen
                 downloadTownsBackground();
                 downloadBarangaysBackground();
                 downloadTicketRepos();
+                getTicketArchives();
             } else {
                 startActivity(new Intent(HomeActivity.this, ConnectionSettingsActivity.class));
             }
+        }
+    }
+
+    public void getTicketArchives() {
+        try {
+            Call<List<Tickets>> ticketCall = requestPlaceHolder.getArchiveTickets(crew);
+
+            ticketCall.enqueue(new Callback<List<Tickets>>() {
+                @Override
+                public void onResponse(Call<List<Tickets>> call, Response<List<Tickets>> response) {
+                    if (response.isSuccessful()) {
+                        new SaveArchiveTickets().execute(response.body());
+                    } else {
+                        Log.e("ERR_GET_ARCHVS", response.message() + "," + response.raw());
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<List<Tickets>> call, Throwable t) {
+                    Log.e("ERR_GET_ARCHVS", t.getMessage());
+                }
+            });
+        } catch (Exception e) {
+            Log.e("ERR_GET_ARCHVS", e.getMessage());
+        }
+    }
+
+    public class SaveArchiveTickets extends AsyncTask<List<Tickets>, Void, Void> {
+
+        @Override
+        protected Void doInBackground(List<Tickets>... lists) {
+            try {
+                if (lists[0] != null) {
+                    List<Tickets> ticketsList = lists[0];
+                    int size = ticketsList.size();
+                    for (int i=0; i<size; i++) {
+                        Tickets ticket = ticketsList.get(i);
+
+                        if (db.ticketsDao().getOne(ticket.getId()) != null) {
+                            // exists
+                        } else {
+                            ticket.setUploadStatus("ARCHIVE");
+                            db.ticketsDao().insertAll(ticket);
+                            Log.e("ARCHIVE", ticket.getId());
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.e("ER_SV_ARCHVS", e.getMessage());
+            }
+            return null;
         }
     }
 }

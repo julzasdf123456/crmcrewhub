@@ -59,14 +59,14 @@ public class LoginSettingsActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            new SaveAppConfig().execute(crewList.get(selectCrew.getSelectedItemPosition()).getId());
+            new SaveAppConfig().execute(crewList.get(selectCrew.getSelectedItemPosition()).getId(), crewList.get(selectCrew.getSelectedItemPosition()).getCrewLeader());
         }
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onBackPressed() {
-        new SaveAppConfig().execute(crewList.get(selectCrew.getSelectedItemPosition()).getId());
+        new SaveAppConfig().execute(crewList.get(selectCrew.getSelectedItemPosition()).getId(), crewList.get(selectCrew.getSelectedItemPosition()).getCrewLeader());
         super.onBackPressed();
     }
 
@@ -80,7 +80,7 @@ public class LoginSettingsActivity extends AppCompatActivity {
 
                 crewList.addAll(crewDao.getAll());
                 for (int i=0; i<crewList.size(); i++) {
-                    crewNames.add(crewList.get(i).getStationName());
+                    crewNames.add("Station " + crewList.get(i).getCrewLeader() + " - " + crewList.get(i).getStationName());
                 }
             } catch (Exception e) {
                 Log.e("ERR_GET_CREW", e.getMessage());
@@ -106,9 +106,10 @@ public class LoginSettingsActivity extends AppCompatActivity {
 
                 if (appConfig != null) {
                     appConfig.setDeviceStation(strings[0]); // strings[0] = CREW ID
+                    appConfig.setCrewLeader(strings[1]); // strings[1] = CREW LEADER
                     appConfigDao.updateAll(appConfig);
                 } else {
-                    appConfigDao.insertAll(new AppConfig(strings[0])); // strings[0] = CREW ID
+                    appConfigDao.insertAll(new AppConfig(strings[0], strings[1])); // strings[0] = CREW ID, strings[1] = CREW LEADER
                 }
             } catch (Exception e) {
                 Log.e("ERR_SV_CONFIG", e.getMessage());

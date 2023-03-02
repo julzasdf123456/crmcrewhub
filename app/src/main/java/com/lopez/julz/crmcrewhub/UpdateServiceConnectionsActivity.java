@@ -11,8 +11,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,6 +32,7 @@ import com.lopez.julz.crmcrewhub.database.ServiceConnectionInspections;
 import com.lopez.julz.crmcrewhub.database.ServiceConnectionInspectionsDao;
 import com.lopez.julz.crmcrewhub.database.ServiceConnections;
 import com.lopez.julz.crmcrewhub.database.ServiceConnectionsDao;
+import com.lopez.julz.crmcrewhub.database.StationCrews;
 import com.lopez.julz.crmcrewhub.database.TimeFrames;
 import com.lopez.julz.crmcrewhub.database.TimeFramesDao;
 import com.lopez.julz.crmcrewhub.database.TownsDao;
@@ -53,6 +56,7 @@ import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -76,7 +80,8 @@ public class UpdateServiceConnectionsActivity extends AppCompatActivity implemen
     public AppDatabase db;
 
     public MaterialButton markTimeOfArrivalBtn, markTimeOfEnergizationBtn;
-    public EditText arrivalDateTime, energizationDateTime, remarks, crewExecuted;
+    public EditText arrivalDateTime, energizationDateTime, remarks;
+    public Spinner crewExecuted;
     public RadioGroup assessment;
     public FloatingActionButton editTimeOfArrivalBtn, editTimeOfEnergizationBtn;
     public ExtendedFloatingActionButton savebtn;
@@ -84,6 +89,8 @@ public class UpdateServiceConnectionsActivity extends AppCompatActivity implemen
     public TextView id, address, meterNumber, meterBrand, meterSeal, verifier, acctType;
 
     private String crew;
+
+    ArrayAdapter crewAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -306,7 +313,7 @@ public class UpdateServiceConnectionsActivity extends AppCompatActivity implemen
                 public void onStyleLoaded(@NonNull Style style) {
                     setStyle(style);
 
-                    new FetchDetails().execute(scId, inspId);
+                    new GetCrews().execute(scId, inspId);
 
                     enableLocationComponent(style);
                 }
@@ -492,9 +499,9 @@ public class UpdateServiceConnectionsActivity extends AppCompatActivity implemen
             verifier.setText(serviceConnections.getVerifier());
             acctType.setText(serviceConnections.getAccountTypeWord());
             if (serviceConnections.getLinemanCrewExecuted() != null) {
-                crewExecuted.setText(serviceConnections.getLinemanCrewExecuted());
+                crewExecuted.setSelection(crewAdapter.getPosition(serviceConnections.getLinemanCrewExecuted()));
             } else {
-                crewExecuted.setText(loggedcrew);
+                crewExecuted.setSelection(crewAdapter.getPosition(loggedcrew));
             }
 
             //set values
@@ -530,9 +537,11 @@ public class UpdateServiceConnectionsActivity extends AppCompatActivity implemen
 
     public class SaveData extends AsyncTask<String, Void, Void> {
 
+        String crewEx = "";
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            crewEx = crewExecuted.getSelectedItem().toString();
         }
 
         @Override
@@ -542,7 +551,8 @@ public class UpdateServiceConnectionsActivity extends AppCompatActivity implemen
 
                 serviceConnections.setDateTimeLinemenArrived(arrivalDateTime.getText().toString());
                 serviceConnections.setDateTimeOfEnergization(energizationDateTime.getText().toString());
-                serviceConnections.setLinemanCrewExecuted(crewExecuted.getText().toString());
+                serviceConnections.setLinemanCrewExecuted(crewExecuted.getSelectedItem().toString());
+                Log.e("TEST", crewEx);
                 if (ObjectHelpers.getSelectedTextFromRadioGroup(assessment, getWindow().getDecorView()) != null) {
                     serviceConnections.setStatus(ObjectHelpers.getSelectedTextFromRadioGroup(assessment, getWindow().getDecorView()));
 
@@ -584,6 +594,50 @@ public class UpdateServiceConnectionsActivity extends AppCompatActivity implemen
         protected void onPostExecute(Void unused) {
             super.onPostExecute(unused);
             finish();
+        }
+    }
+
+    public class GetCrews extends AsyncTask<String, Void, Void> {
+
+        public List<StationCrews> stationCrewsList;
+        public String scId, inspId;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            stationCrewsList = new ArrayList<>();
+        }
+
+        @Override
+        protected Void doInBackground(String... strings) {
+            try {
+                stationCrewsList.addAll(db.stationCrewsDao().getAll());
+                scId = strings[0];
+                inspId = strings[1];
+            } catch (Exception e) {
+                Log.e("ERR_GET_CREWS", e.getMessage());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void unused) {
+            super.onPostExecute(unused);
+
+            try {
+                List<String> crews = new ArrayList<>();
+                for(int i=0; i<stationCrewsList.size(); i++) {
+                    crews.add(stationCrewsList.get(i).getStationName());
+                }
+
+                crewAdapter = new ArrayAdapter(UpdateServiceConnectionsActivity.this, R.layout.spinner_item, crews.toArray());
+                crewAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                crewExecuted.setAdapter(crewAdapter);
+                new FetchDetails().execute(scId, inspId);
+//                new FetchDetails().execute();
+            } catch (Exception e) {
+                Log.e("ERR_DSP_CREWS", e.getMessage());
+            }
         }
     }
 }

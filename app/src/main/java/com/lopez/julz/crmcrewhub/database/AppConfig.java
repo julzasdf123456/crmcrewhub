@@ -14,6 +14,9 @@ public class AppConfig {
     @ColumnInfo(name = "DeviceStation")
     private String DeviceStation;
 
+    @ColumnInfo(name = "CrewLeader")
+    private String CrewLeader;
+
     public AppConfig() {
     }
 
@@ -24,6 +27,11 @@ public class AppConfig {
 
     public AppConfig(String deviceStation) {
         DeviceStation = deviceStation;
+    }
+
+    public AppConfig(String deviceStation, String crewLeader) {
+        DeviceStation = deviceStation;
+        CrewLeader = crewLeader;
     }
 
     public int getId() {
@@ -40,5 +48,13 @@ public class AppConfig {
 
     public void setDeviceStation(String deviceStation) {
         DeviceStation = deviceStation;
+    }
+
+    public String getCrewLeader() {
+        return CrewLeader;
+    }
+
+    public void setCrewLeader(String crewLeader) {
+        CrewLeader = crewLeader;
     }
 }
